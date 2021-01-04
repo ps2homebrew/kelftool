@@ -31,7 +31,7 @@ std::string getKeyStorePath()
 
 int decrypt(int argc, char** argv)
 {
-	if (argc < 2)
+	if (argc < 3)
 	{
 		printf("%s decrypt <input> <output>\n", argv[0]);
 		return -1;
@@ -49,7 +49,7 @@ int decrypt(int argc, char** argv)
 	ret = kelf.LoadKelf(argv[1]);
 	if (ret != 0)
 	{
-		printf("Failed to LoadKelf!\n");
+		printf("Failed to LoadKelf %d!\n",ret);
 		return ret;
 	}
 	ret = kelf.SaveContent(argv[2]);
@@ -64,10 +64,27 @@ int decrypt(int argc, char** argv)
 
 int encrypt(int argc, char** argv)
 {
-	if (argc < 2)
+
+	int headerid=-1;
+
+	if (argc < 4)
 	{
-		printf("%s decrypt <input> <output>\n", argv[0]);
+		printf("%s encrypt <headerid> <input> <output>\n", argv[0]);
+		printf("<headerid>: fmcb,fhdb\n");
 		return -1;
+	}
+
+if (strcmp("fmcb", argv[1]) == 0)
+	headerid=0;	
+
+if (strcmp("fhdb", argv[1]) == 0)
+	headerid=1;
+
+    if(headerid==-1){
+
+      printf("Invalid header: %s\n",argv[1]);
+		return -1;
+
 	}
 
 	KeyStore ks;
@@ -79,13 +96,16 @@ int encrypt(int argc, char** argv)
 	}
 
 	Kelf kelf(ks);
-	ret = kelf.LoadContent(argv[1]);
+	ret = kelf.LoadContent(argv[2]);
 	if (ret != 0)
 	{
 		printf("Failed to LoadContent!\n");
 		return ret;
 	}
-	ret = kelf.SaveKelf(argv[2]);
+
+
+
+	ret = kelf.SaveKelf(argv[3],headerid);
 	if (ret != 0)
 	{
 		printf("Failed to SaveKelf!\n");
@@ -102,7 +122,7 @@ int main(int argc, char** argv)
 		printf("usage: %s <submodule> <args>\n", argv[0]);
 		printf("Available submodules:\n");
 		printf("\tdecrypt - decrypt and check signature of kelf files\n");
-		printf("\tencrypt - encrypt and sign kelf files\n");
+		printf("\tencrypt <headerid> - encrypt and sign kelf files <headerid>: fmcb,fhdb\n");
 		return -1;
 	}
 

@@ -18,6 +18,7 @@
 #include <fstream>
 #include <vector>
 #include <sstream>
+#include <iostream>
 
 std::vector<std::string> split(const std::string& s, char delimiter)
 {
@@ -63,9 +64,12 @@ int KeyStore::Load(std::string filename)
 	while (std::getline(infile, line))
 	{
 		std::vector<std::string> tokens = split(line, '=');
-
+               
+  
 		if (tokens.size() != 2)
+                       
 			return KEYSTORE_ERROR_LINE_NOT_KEY_VALUE;
+
 
 		std::string key = tokens[0];
 		std::string value = tokens[1];
