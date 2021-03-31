@@ -70,7 +70,7 @@ int encrypt(int argc, char** argv)
 	if (argc < 4)
 	{
 		printf("%s encrypt <headerid> <input> <output>\n", argv[0]);
-		printf("<headerid>: fmcb,fhdb\n");
+		printf("<headerid>: fmcb,fhdb, mbr\n");
 		return -1;
 	}
 
@@ -79,6 +79,9 @@ if (strcmp("fmcb", argv[1]) == 0)
 
 if (strcmp("fhdb", argv[1]) == 0)
 	headerid=1;
+
+if (strcmp("mbr", argv[1]) == 0)
+	headerid=2;	
 
     if(headerid==-1){
 
@@ -122,7 +125,7 @@ int main(int argc, char** argv)
 		printf("usage: %s <submodule> <args>\n", argv[0]);
 		printf("Available submodules:\n");
 		printf("\tdecrypt - decrypt and check signature of kelf files\n");
-		printf("\tencrypt <headerid> - encrypt and sign kelf files <headerid>: fmcb,fhdb\n");
+		printf("\tencrypt <headerid> - encrypt and sign kelf files <headerid>: fmcb,fhdb, mbr\n");
 		return -1;
 	}
 

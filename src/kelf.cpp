@@ -167,12 +167,22 @@ int Kelf::SaveKelf(std::string filename,int headerid)
 
 	static uint8_t USER_HEADER_FHDB[]={ 0x01, 0x00, 0x00, 0x04, 0x00, 0x02, 0x00, 0x4A, 0x00, 0x08, 0x01, 0x00, 0x00, 0x00, 0x00, 0x1B };
 
+	static uint8_t USER_HEADER_MBR[]={ 0x01, 0x00, 0x00, 0x04, 0x00, 0x02, 0x01, 0x57, 0x07, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x2A };
 
-	if(headerid==0)
-	PSX_USER = USER_HEADER_FMCB;
-        else
-	PSX_USER = USER_HEADER_FHDB;
-      
+	switch(headerid){
+		case 0:
+		PSX_USER = USER_HEADER_FMCB;
+		break;
+
+		case 1:
+			PSX_USER = USER_HEADER_FHDB;
+		break;
+
+		case 2:
+		PSX_USER = USER_HEADER_MBR;
+		break;
+	}
+	  
 	memcpy(header.UserDefined, PSX_USER, 16);
 	header.ContentSize = Content.size();
 	header.HeaderSize = sizeof(KELFHeader) + 8 + 16 + 16 + 8 + 16 + 16 + 8 + 8; // header + header signature + kbit + kc + bittable + bittable signature + root signature
