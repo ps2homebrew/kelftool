@@ -73,7 +73,7 @@ public:
 	Kelf(KeyStore& _ks) : ks(_ks) { }
 
 	int LoadKelf(std::string filename);
-	int SaveKelf(std::string filename);
+	int SaveKelf(std::string filename,int header);
 	int LoadContent(std::string filename);
 	int SaveContent(std::string filename);
 

@@ -155,20 +155,42 @@ int Kelf::LoadKelf(std::string filename)
 	return 0;
 }
 
-int Kelf::SaveKelf(std::string filename)
+int Kelf::SaveKelf(std::string filename,int headerid)
 {
 	FILE* f = fopen(filename.c_str(), "wb");
 
 	KELFHeader header;
-	static uint8_t PSX_USER[] = { 0x01, 0x03, 0x00, 0x04, 0x00, 0x02, 0x00, 0x4A, 0x00, 0x07, 0x01, 0x00, 0x00, 0x00, 0x01, 0x78 };
+
+	static uint8_t *PSX_USER;
+
+	static uint8_t USER_HEADER_FMCB[]={ 0x01, 0x00, 0x00, 0x01, 0x00, 0x03, 0x00, 0x4A, 0x00, 0x01, 0x02, 0x19, 0x00, 0x00, 0x00, 0x56 };
+
+	static uint8_t USER_HEADER_FHDB[]={ 0x01, 0x00, 0x00, 0x04, 0x00, 0x02, 0x00, 0x4A, 0x00, 0x08, 0x01, 0x00, 0x00, 0x00, 0x00, 0x1B };
+
+	static uint8_t USER_HEADER_MBR[]={ 0x01, 0x00, 0x00, 0x04, 0x00, 0x02, 0x01, 0x57, 0x07, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x2A };
+
+	switch(headerid){
+		case 0:
+		PSX_USER = USER_HEADER_FMCB;
+		break;
+
+		case 1:
+			PSX_USER = USER_HEADER_FHDB;
+		break;
+
+		case 2:
+		PSX_USER = USER_HEADER_MBR;
+		break;
+	}
+	  
 	memcpy(header.UserDefined, PSX_USER, 16);
 	header.ContentSize = Content.size();
 	header.HeaderSize = sizeof(KELFHeader) + 8 + 16 + 16 + 8 + 16 + 16 + 8 + 8; // header + header signature + kbit + kc + bittable + bittable signature + root signature
-	header.SystemType = SYSTEM_TYPE_PSX;
+	header.SystemType = SYSTEM_TYPE_PS2;
 	header.ApplicationType = 1; // 1 = xosdmain, 5 = dvdplayer kirx 7 = dvdplayer kelf
 	header.Flags = 0x22C;
 	header.BitCount = 0;
-	header.MGZones = 1; // Japan
+	header.MGZones = 0xFF; // ??
 
 	std::string HeaderSignature = GetHeaderSignature(header);
 	std::string BitTableSignature = GetBitTableSignature();
