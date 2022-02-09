@@ -1,12 +1,15 @@
 # kelftool
-An open-source utility for decrypt, encrypt and sign PS2 KELF and PSX KELF files.
 
-#### You need to bring your own keys.
+An open-source utility for decrypting, encrypting and signing PS2/PSX DESR KELF files.
 
-Place them at your home directory (%USERPROFILE%) in "PS2KEYS.dat" file as a 'KEY=HEX_VALUE' pair.
+## You need to bring your keys
 
-## SHA256 Hashes of the keys:
+Place them at your home directory (%USERPROFILE%) in the "PS2KEYS.dat" file as a 'KEY=HEX_VALUE' pair.
+
+## SHA256 Hashes of the keys
+
 ### THESE ARE HASHES, NOT THE ACTUAL KEYS
+
 **MG_SIG_MASTER_KEY**=*e6e41172c069b752b9e88d31c70606c580b1c15ee782abd83cf34117bfc47c91*
 **MG_SIG_HASH_KEY**=*0dc3a1e225d3e701cfd07c2b25e7a3cc661ded10870218f1f22f936ba350bef5*
 **MG_KBIT_MASTER_KEY**=*1512f3f196d6edb723e3c2f4258f6a937c4efd6441785b02d7c9ea7c817ad8fa*
