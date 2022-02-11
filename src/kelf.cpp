@@ -94,6 +94,7 @@ int Kelf::LoadKelf(std::string filename)
         printf("This file is not supported yet and looked after.");
         printf("Please upload it and post it under that issue:");
         printf("https://github.com/xfwcfw/kelftool/issues/1");
+        fclose(f);
         return KELF_ERROR_UNSUPPORTED_FILE;
     }
 
@@ -101,8 +102,10 @@ int Kelf::LoadKelf(std::string filename)
     HeaderSignature.resize(8);
     fread(HeaderSignature.data(), 1, HeaderSignature.size(), f);
 
-    if (HeaderSignature != GetHeaderSignature(header))
+    if (HeaderSignature != GetHeaderSignature(header)) {
+        fclose(f);
         return KELF_ERROR_INVALID_HEADER_SIGNATURE;
+    }
 
     std::string KEK = DeriveKeyEncryptionKey(header);
 
@@ -115,8 +118,10 @@ int Kelf::LoadKelf(std::string filename)
     DecryptKeys(KEK);
 
     int BitTableSize = header.HeaderSize - ftell(f) - 8 - 8;
-    if (BitTableSize > sizeof(BitTable))
+    if (BitTableSize > sizeof(BitTable)) {
+        fclose(f);
         return KELF_ERROR_INVALID_BIT_TABLE_SIZE;
+    }
 
     fread(&bitTable, 1, BitTableSize, f);
 
@@ -126,15 +131,19 @@ int Kelf::LoadKelf(std::string filename)
     BitTableSignature.resize(8);
     fread(BitTableSignature.data(), 1, BitTableSignature.size(), f);
 
-    if (BitTableSignature != GetBitTableSignature())
+    if (BitTableSignature != GetBitTableSignature()) {
+        fclose(f);
         return KELF_ERROR_INVALID_BIT_TABLE_SIGNATURE;
+    }
 
     std::string RootSignature;
     RootSignature.resize(8);
     fread(RootSignature.data(), 1, RootSignature.size(), f);
 
-    if (RootSignature != GetRootSignature(HeaderSignature, BitTableSignature))
+    if (RootSignature != GetRootSignature(HeaderSignature, BitTableSignature)) {
+        fclose(f);
         return KELF_ERROR_INVALID_ROOT_SIGNATURE;
+    }
 
     for (int i = 0; i < bitTable.BlockCount; i++) {
         std::string Block;
@@ -145,8 +154,10 @@ int Kelf::LoadKelf(std::string filename)
 
     DecryptContent(header.Flags >> 4 & 3);
 
-    if (VerifyContentSignature() != 0)
+    if (VerifyContentSignature() != 0) {
+        fclose(f);
         return KELF_ERROR_INVALID_CONTENT_SIGNATURE;
+    }
 
     fclose(f);
 
@@ -336,7 +347,7 @@ std::string Kelf::GetBitTableSignature()
     return std::string((char *)signature, 8);
 }
 
-std::string Kelf::GetRootSignature(std::string HeaderSignature, std::string BitTableSignature)
+std::string Kelf::GetRootSignature(const std::string HeaderSignature, const std::string BitTableSignature)
 {
     std::string Signatures;
     Signatures += HeaderSignature;
