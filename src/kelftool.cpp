@@ -22,7 +22,7 @@
 
 std::string getKeyStorePath()
 {
-#ifdef __linux__
+#if defined(__linux__) || defined(__APPLE__)
     return std::string(getenv("HOME")) + "/PS2KEYS.dat";
 #else
     return std::string(getenv("USERPROFILE")) + "\\PS2KEYS.dat";
@@ -65,7 +65,7 @@ int encrypt(int argc, char **argv)
 
     if (argc < 4) {
         printf("%s encrypt <headerid> <input> <output>\n", argv[0]);
-        printf("<headerid>: fmcb,fhdb, mbr\n");
+        printf("<headerid>: fmcb, fhdb, mbr\n");
         return -1;
     }
 
@@ -114,6 +114,12 @@ int main(int argc, char **argv)
         printf("Available submodules:\n");
         printf("\tdecrypt - decrypt and check signature of kelf files\n");
         printf("\tencrypt <headerid> - encrypt and sign kelf files <headerid>: fmcb, fhdb, mbr\n");
+        printf("\t\tfmcb - for retail PS2 memory cards\n");
+        printf("\t\tfhdb - for retail PS2 HDD (HDD OSD / BB Navigator)\n");
+        printf("\t\tmbr  - for retail PS2 HDD (mbr injection).\n");
+        printf("\t\t       Note: for mbr elf should load from 0x100000 and should be without headers:\n");
+        printf("\t\t       readelf -h <input_elf> should show 0x100000 or 0x100008\n");
+        printf("\t\t       $(EE_OBJCOPY) -O binary -v <input_elf> <headerless_elf>\n");
         return -1;
     }
 

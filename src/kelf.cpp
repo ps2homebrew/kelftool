@@ -97,10 +97,61 @@ int Kelf::LoadKelf(std::string filename)
         fclose(f);
         return KELF_ERROR_UNSUPPORTED_FILE;
     }
+    printf("header.UserDefined     =");
+    for (size_t i = 0; i < sizeof(header.UserDefined); ++i)
+        printf(" %02X", header.UserDefined[i]);
+    if (!memcmp(header.UserDefined, USER_HEADER_FMCB, 16))
+        printf(" (FMCB)\n");
+    else if (!memcmp(header.UserDefined, USER_HEADER_FHDB, 16))
+        printf(" (FHDB)\n");
+    else if (!memcmp(header.UserDefined, USER_HEADER_MBR, 16))
+        printf(" (MBR)\n");
+    else
+        printf("\n");
+
+    printf("header.ContentSize     = %#X\n", header.ContentSize);
+    printf("header.HeaderSize      = %#X\n", header.HeaderSize);
+    switch (header.SystemType) {
+        case 0:
+            printf("header.SystemType      = 0 (SYSTEM_TYPE_PS2)\n");
+            break;
+        case 1:
+            printf("header.SystemType      = 1 (SYSTEM_TYPE_PSX)\n");
+            break;
+        default:
+            printf("header.SystemType      = %#X\n", header.SystemType);
+            printf("    This value is unknown.\n");
+            printf("    Please upload file and post under that issue:\n");
+            printf("    https://github.com/xfwcfw/kelftool/issues/1\n");
+            break;
+    }
+    switch (header.ApplicationType) {
+        case 1:
+            printf("header.SystemType      = 1 (xosdmain)\n");
+            break;
+        case 5:
+            printf("header.SystemType      = 5 (dvdplayer kirx)\n");
+            break;
+        case 7:
+            printf("header.SystemType      = 7 (dvdplayer kelf)\n");
+            break;
+        default:
+            printf("header.SystemType      = %#X\n", header.ApplicationType);
+            printf("    This value is unknown.\n");
+            printf("    Please upload file and post under that issue:\n");
+            printf("    https://github.com/xfwcfw/kelftool/issues/1\n");
+            break;
+    }
+    printf("header.Flags           = %#X\n", header.Flags);
+    printf("header.BitCount        = %#X\n", header.BitCount);
+    printf("header.MGZones         = %#X\n", header.MGZones);
 
     std::string HeaderSignature;
     HeaderSignature.resize(8);
     fread(HeaderSignature.data(), 1, HeaderSignature.size(), f);
+    printf("HeaderSignature        =");
+    for (size_t i = 0; i < 8; ++i)
+        printf(" %02X", (unsigned char)HeaderSignature[i]);
 
     if (HeaderSignature != GetHeaderSignature(header)) {
         fclose(f);
@@ -111,13 +162,20 @@ int Kelf::LoadKelf(std::string filename)
 
     Kbit.resize(16);
     fread(Kbit.data(), 1, Kbit.size(), f);
+    printf("\nKbit                   =");
+    for (size_t i = 0; i < 16; ++i)
+        printf(" %02X", (unsigned char)Kbit[i]);
 
     Kc.resize(16);
     fread(Kc.data(), 1, Kc.size(), f);
+    printf("\nKc                     =");
+    for (size_t i = 0; i < 16; ++i)
+        printf(" %02X", (unsigned char)Kc[i]);
 
     DecryptKeys(KEK);
 
     int BitTableSize = header.HeaderSize - ftell(f) - 8 - 8;
+    printf("\nBitTableSize           = %#X\n", BitTableSize);
     if (BitTableSize > sizeof(BitTable)) {
         fclose(f);
         return KELF_ERROR_INVALID_BIT_TABLE_SIZE;
@@ -126,10 +184,26 @@ int Kelf::LoadKelf(std::string filename)
     fread(&bitTable, 1, BitTableSize, f);
 
     TdesCbcCfb64Decrypt((uint8_t *)&bitTable, (uint8_t *)&bitTable, BitTableSize, (uint8_t *)Kbit.data(), 2, ks.GetContentTableIV().data());
+    printf("bitTable.HeaderSize    = %#X\n", bitTable.HeaderSize);
+    printf("bitTable.BlockCount    = %d\n", bitTable.BlockCount);
+    printf("bitTable.gap           =");
+    for (unsigned int i = 0; i < 3; ++i)
+        printf(" %02X", (unsigned char)bitTable.gap[i]);
+    printf("\n                          Size        Flags       Signature");
+    for (unsigned int i = 0; i < bitTable.BlockCount; ++i) {
+        printf("\n    bitTable.Blocks[%d]  = %08X", (int)i, bitTable.Blocks[i].Size);
+        printf("    %08X    ", bitTable.Blocks[i].Flags);
+        for (size_t j = 0; j < 8; ++j)
+            printf("%02X", (unsigned char)bitTable.Blocks[i].Signature[j]);
+    }
+
 
     std::string BitTableSignature;
     BitTableSignature.resize(8);
     fread(BitTableSignature.data(), 1, BitTableSignature.size(), f);
+    printf("\nBitTableSignature      =");
+    for (size_t i = 0; i < 8; ++i)
+        printf(" %02X", (unsigned char)BitTableSignature[i]);
 
     if (BitTableSignature != GetBitTableSignature()) {
         fclose(f);
@@ -139,7 +213,10 @@ int Kelf::LoadKelf(std::string filename)
     std::string RootSignature;
     RootSignature.resize(8);
     fread(RootSignature.data(), 1, RootSignature.size(), f);
-
+    printf("\nRootSignature          =");
+    for (size_t i = 0; i < 8; ++i)
+        printf(" %02X", (unsigned char)RootSignature[i]);
+    printf("\n");
     if (RootSignature != GetRootSignature(HeaderSignature, BitTableSignature)) {
         fclose(f);
         return KELF_ERROR_INVALID_ROOT_SIGNATURE;
@@ -170,42 +247,37 @@ int Kelf::SaveKelf(std::string filename, int headerid)
 
     KELFHeader header;
 
-    static uint8_t *PSX_USER;
-
-    static uint8_t USER_HEADER_FMCB[] = {0x01, 0x00, 0x00, 0x01, 0x00, 0x03, 0x00, 0x4A, 0x00, 0x01, 0x02, 0x19, 0x00, 0x00, 0x00, 0x56};
-    static uint8_t USER_HEADER_FHDB[] = {0x01, 0x00, 0x00, 0x04, 0x00, 0x02, 0x00, 0x4A, 0x00, 0x08, 0x01, 0x00, 0x00, 0x00, 0x00, 0x1B};
-    static uint8_t USER_HEADER_MBR[]  = {0x01, 0x00, 0x00, 0x04, 0x00, 0x02, 0x01, 0x57, 0x07, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x2A};
+    static uint8_t *USER_HEADER;
 
     switch (headerid) {
         case 0:
-            PSX_USER = USER_HEADER_FMCB;
+            USER_HEADER = USER_HEADER_FMCB;
             break;
 
         case 1:
-            PSX_USER = USER_HEADER_FHDB;
+            USER_HEADER = USER_HEADER_FHDB;
             break;
 
         case 2:
-            PSX_USER = USER_HEADER_MBR;
+            USER_HEADER = USER_HEADER_MBR;
             break;
     }
 
-    memcpy(header.UserDefined, PSX_USER, 16);
-    header.ContentSize     = Content.size();
-    header.HeaderSize      = sizeof(KELFHeader) + 8 + 16 + 16 + 8 + 16 + 16 + 8 + 8; // header + header signature + kbit + kc + bittable + bittable signature + root signature
-    header.SystemType      = SYSTEM_TYPE_PS2;
-    header.ApplicationType = 1; // 1 = xosdmain, 5 = dvdplayer kirx 7 = dvdplayer kelf
-    header.Flags           = 0x22C;
-    header.BitCount        = 0;
-    header.MGZones         = 0xFF; // ??
+    memcpy(header.UserDefined, USER_HEADER, 16);
+    header.ContentSize     = Content.size();      // sometimes zero
+    header.HeaderSize      = bitTable.HeaderSize; // header + header signature + kbit + kc + bittable + bittable signature + root signature
+    header.SystemType      = SYSTEM_TYPE_PS2;     // same for COH (arcade)
+    header.ApplicationType = 1;                   // 1 = xosdmain, 5 = dvdplayer kirx 7 = dvdplayer kelf
+    header.Flags           = 0x022C;              // 001000101100 binary
+    header.BitCount        = 0;                   // ??
+    header.MGZones         = 0x000000FF;          // ??
 
     std::string HeaderSignature   = GetHeaderSignature(header);
     std::string BitTableSignature = GetBitTableSignature();
     std::string RootSignature     = GetRootSignature(HeaderSignature, BitTableSignature);
 
     int BitTableSize = (bitTable.BlockCount * 2 + 1) * 8;
-
-    TdesCbcCfb64Encrypt((uint8_t *)&bitTable, (uint8_t *)&bitTable, (bitTable.BlockCount * 2 + 1) * 8, (uint8_t *)Kbit.data(), 2, ks.GetContentTableIV().data());
+    TdesCbcCfb64Encrypt((uint8_t *)&bitTable, (uint8_t *)&bitTable, BitTableSize, (uint8_t *)Kbit.data(), 2, ks.GetContentTableIV().data());
 
     std::string KEK = DeriveKeyEncryptionKey(header);
     EncryptKeys(KEK);
@@ -241,14 +313,16 @@ int Kelf::LoadContent(std::string filename)
     Kc.resize(16);
     memset(Kc.data(), 0xBB, Kc.size());
 
-    bitTable.HeaderSize      = sizeof(KELFHeader) + 8 + 16 + 16 + 8 + 16 + 16 + 8 + 8; // header + header signature + kbit + kc + bittable + bittable signature + root signature
+    std::fill(bitTable.gap, bitTable.gap + 3, 0);
+
     bitTable.BlockCount      = 2;
+    bitTable.HeaderSize      = sizeof(KELFHeader) + 8 + 16 + 16 + (bitTable.BlockCount * 2 + 1) * 8 + 8 + 8; // header + header signature + kbit + kc + bittable (2 blocks) + bittable signature + root signature
     bitTable.Blocks[0].Size  = 0x20;
     bitTable.Blocks[0].Flags = BIT_BLOCK_SIGNED | BIT_BLOCK_ENCRYPTED;
     memset(bitTable.Blocks[0].Signature, 0, 8);
 
     // Sign
-    for (int j = 0; j < 0x20; j += 8)
+    for (int j = 0; j < bitTable.Blocks[0].Size; j += 8)
         xor_bit(&Content.data()[j], bitTable.Blocks[0].Signature, bitTable.Blocks[0].Signature, 8);
 
     uint8_t MG_SIG_MASTER_AND_HASH_KEY[16];
@@ -258,9 +332,9 @@ int Kelf::LoadContent(std::string filename)
     TdesCbcCfb64Encrypt(bitTable.Blocks[0].Signature, bitTable.Blocks[0].Signature, 8, MG_SIG_MASTER_AND_HASH_KEY, 2, MG_IV_NULL);
 
     // Encrypt
-    TdesCbcCfb64Encrypt(Content.data(), Content.data(), 0x20, Kc.data(), 2, ks.GetContentIV().data());
+    TdesCbcCfb64Encrypt(Content.data(), Content.data(), bitTable.Blocks[0].Size, Kc.data(), 2, ks.GetContentIV().data());
 
-    bitTable.Blocks[1].Size  = Content.size() - 0x20;
+    bitTable.Blocks[1].Size  = Content.size() - bitTable.Blocks[0].Size;
     bitTable.Blocks[1].Flags = 0;
     memset(bitTable.Blocks[1].Signature, 0, 8);
 

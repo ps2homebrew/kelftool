@@ -116,7 +116,7 @@ std::string KeyStore::getErrorString(int err)
         case KEYSTORE_ERROR_OPEN_FAILED:
             return "Failed to open keystore!";
         case KEYSTORE_ERROR_LINE_NOT_KEY_VALUE:
-            return "Line in the keystore file is not key-value pair!";
+            return "Line in the keystore file is not key=value pair!";
         case KEYSTORE_ERROR_ODD_LEN_VALUE:
             return "Odd length hex value in keystore!";
         case KEYSTORE_ERROR_MISSING_KEY:
