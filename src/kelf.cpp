@@ -86,6 +86,10 @@ void xor_bit(const void *a, const void *b, void *Result, size_t Length)
 int Kelf::LoadKelf(std::string filename)
 {
     FILE *f = fopen(filename.c_str(), "rb");
+    if (f == NULL) {
+        fprintf(stderr, "Couldn't open %s: %s\n", filename.c_str(), strerror(errno));
+        return KELF_ERROR_UNSUPPORTED_FILE;
+    }
 
     KELFHeader header;
     fread(&header, sizeof(header), 1, f);
@@ -127,7 +131,7 @@ int Kelf::LoadKelf(std::string filename)
     }
     switch (header.ApplicationType) {
         case 0:
-            printf("header.ApplicationType = 0 (disc wobble ??)\n");
+            printf("header.ApplicationType = 0 (disc wobble \?)\n");
             break;
         case 1:
             printf("header.ApplicationType = 1 (xosdmain)\n");
@@ -139,7 +143,7 @@ int Kelf::LoadKelf(std::string filename)
             printf("header.ApplicationType = 7 (dvdplayer kelf)\n");
             break;
         case 11:
-            printf("header.ApplicationType = 11 (early mbr ??)\n");
+            printf("header.ApplicationType = 11 (early mbr \?)\n");
             break;
         default:
             printf("header.ApplicationType = %#X\n", header.ApplicationType);
@@ -148,7 +152,47 @@ int Kelf::LoadKelf(std::string filename)
             printf("    https://github.com/xfwcfw/kelftool/issues/1\n");
             break;
     }
-    printf("header.Flags           = %#X\n", header.Flags);
+    printf("header.Flags           = %#X", header.Flags);
+    if (header.Flags == 0x22C)
+        printf(" - kelf:");
+    else if (header.Flags == 0x22C)
+        printf(" - kirx:");
+    else
+        printf(" - unknown:");
+    if (header.Flags & HDR_BLACKLIST)
+        printf("HDR_BLACKLIST|");
+    if (header.Flags & HDR_WHITELIST)
+        printf("HDR_WHITELIST|");
+    if (header.Flags & HDR_FLAG2)
+        printf("HDR_FLAG2|");
+    if (header.Flags & HDR_FLAG3)
+        printf("HDR_FLAG3|");
+    if (header.Flags & HDR_1DES)
+        printf("HDR_1DES|");
+    if (header.Flags & HDR_3DES)
+        printf("HDR_3DES|");
+    if (header.Flags & HDR_FLAG6)
+        printf("HDR_FLAG6|");
+    if (header.Flags & HDR_FLAG7)
+        printf("HDR_FLAG7|");
+    if (header.Flags & HDR_FLAG8)
+        printf("HDR_FLAG8|");
+    if (header.Flags & HDR_FLAG9)
+        printf("HDR_FLAG9|");
+    if (header.Flags & HDR_FLAG10)
+        printf("HDR_FLAG10|");
+    if (header.Flags & HDR_FLAG11)
+        printf("HDR_FLAG11|");
+    if (header.Flags & HDR_FLAG12)
+        printf("HDR_FLAG12|");
+    if (header.Flags & HDR_FLAG13)
+        printf("HDR_FLAG13|");
+    if (header.Flags & HDR_FLAG14)
+        printf("HDR_FLAG14|");
+    if (header.Flags & HDR_FLAG15)
+        printf("HDR_FLAG15|");
+    printf("\n");
+
     printf("header.BitCount        = %#X\n", header.BitCount);
     printf("header.MGZones         = %#X |", header.MGZones);
     if (header.MGZones == 0)
@@ -173,6 +217,7 @@ int Kelf::LoadKelf(std::string filename)
         if (header.MGZones & REGION_MX)
             printf("Mexico|");
     }
+    printf("\n");
 
     printf("header.gap             =");
     for (unsigned int i = 0; i < 3; ++i)
@@ -299,7 +344,10 @@ int Kelf::LoadKelf(std::string filename)
 int Kelf::SaveKelf(std::string filename, int headerid)
 {
     FILE *f = fopen(filename.c_str(), "wb");
-
+    if (f == NULL) {
+        fprintf(stderr, "Couldn't open %s: %s\n", filename.c_str(), strerror(errno));
+        return KELF_ERROR_UNSUPPORTED_FILE;
+    }
     KELFHeader header;
 
     static uint8_t *USER_HEADER;
@@ -359,6 +407,10 @@ int Kelf::SaveKelf(std::string filename, int headerid)
 int Kelf::LoadContent(std::string filename, int headerid)
 {
     FILE *f = fopen(filename.c_str(), "rb");
+    if (f == NULL) {
+        fprintf(stderr, "Couldn't open %s: %s\n", filename.c_str(), strerror(errno));
+        return KELF_ERROR_UNSUPPORTED_FILE;
+    }
     fseek(f, 0, SEEK_END);
     Content.resize(ftell(f));
     fseek(f, 0, SEEK_SET);
@@ -474,6 +526,10 @@ int Kelf::LoadContent(std::string filename, int headerid)
 int Kelf::SaveContent(std::string filename)
 {
     FILE *f = fopen(filename.c_str(), "wb");
+    if (f == NULL) {
+        fprintf(stderr, "Couldn't open %s: %s\n", filename.c_str(), strerror(errno));
+        return KELF_ERROR_UNSUPPORTED_FILE;
+    }
     fwrite(Content.data(), 1, Content.size(), f);
     fclose(f);
 

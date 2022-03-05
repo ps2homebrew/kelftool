@@ -58,22 +58,22 @@ struct KELFHeader
 };
 
 // possible BitBlock.Flags. Other bit flags should be unset
-#define HDR1_BLACKLIST 0x1    // Unset. if set then BitCount should be non-zero, and header will change its size
-#define HDR1_WHITELIST 0x2    // Unset. maybe whitelist? ICVPS2 ??
-#define HDR1_FLAG2     0x4    // Set. ??
-#define HDR1_FLAG3     0x8    // Set. ??
-#define HDR1_1DES      0x10   // Set in kirx. HDR1_3DES should be unset. Represents Single DES encryption
-#define HDR1_3DES      0x20   // Set in kelf. HDR1_1DES should be unset. Represents Single DES encryption
-#define HDR1_FLAG6     0x40   // Unset. ??
-#define HDR1_FLAG7     0x80   // Unset. ??
-#define HDR2_FLAG0     0x100  // Unset. ??
-#define HDR2_FLAG1     0x200  // Unset. ??
-#define HDR2_FLAG2     0x400  // Set. ??
-#define HDR2_FLAG3     0x800  // Unset. ??
-#define HDR2_FLAG4     0x1000 // Unset. ??
-#define HDR2_FLAG5     0x2000 // Unset. ??
-#define HDR2_FLAG6     0x4000 // Unset. ??
-#define HDR2_FLAG7     0x8000 // Unset. ??
+#define HDR_BLACKLIST 0x1    // Unset. if set then BitCount should be non-zero, and header will change its size
+#define HDR_WHITELIST 0x2    // Unset. maybe whitelist? ICVPS2 ??
+#define HDR_FLAG2     0x4    // Set. ??
+#define HDR_FLAG3     0x8    // Set. ??
+#define HDR_1DES      0x10   // Set in kirx. HDR_3DES should be unset. Represents Single DES encryption
+#define HDR_3DES      0x20   // Set in kelf. HDR_1DES should be unset. Represents Single DES encryption
+#define HDR_FLAG6     0x40   // Unset. ??
+#define HDR_FLAG7     0x80   // Unset. ??
+#define HDR_FLAG8     0x100  // Unset. ??
+#define HDR_FLAG9     0x200  // Unset. ??
+#define HDR_FLAG10     0x400  // Set. ??
+#define HDR_FLAG11     0x800  // Unset. ??
+#define HDR_FLAG12     0x1000 // Unset. ??
+#define HDR_FLAG13     0x2000 // Unset. ??
+#define HDR_FLAG14     0x4000 // Unset. ??
+#define HDR_FLAG15     0x8000 // Unset. ??
 
 // MGZones region flags. If unset - blocked in that region
 #define REGION_JP   0x1  // Japan
