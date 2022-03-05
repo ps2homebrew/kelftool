@@ -12,7 +12,9 @@ CXXFLAGS = --std=c++17
 LDLIBS = -lcrypto
 
 # next flags only for macos
-OUTPUT_OPTION = -I/usr/local/opt/openssl@1.1/include
+OUTPUT_OPTION += -I/Users/user/usr/local/Cellar/openssl@1.1/1.1.1m/include
+LDLIBS += -L/Users/user/usr/local/Cellar/openssl@1.1/1.1.1m/lib
+OUTPUT_OPTION += -I/usr/local/opt/openssl@1.1/include
 LDLIBS += -L/usr/local/opt/openssl@1.1/lib
 
 objects =	$(patsubst $(dir_source)/%.cpp, $(dir_build)/%.o, \

@@ -92,7 +92,7 @@ int encrypt(int argc, char **argv)
     }
 
     Kelf kelf(ks);
-    ret = kelf.LoadContent(argv[2]);
+    ret = kelf.LoadContent(argv[2], headerid);
     if (ret != 0) {
         printf("Failed to LoadContent!\n");
         return ret;
