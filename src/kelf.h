@@ -34,6 +34,8 @@ static uint8_t USER_HEADER_FMCB[16] = {0x01, 0x00, 0x00, 0x01, 0x00, 0x03, 0x00,
 static uint8_t USER_HEADER_FHDB[16] = {0x01, 0x00, 0x00, 0x04, 0x00, 0x02, 0x00, 0x4A, 0x00, 0x08, 0x01, 0x00, 0x00, 0x00, 0x00, 0x1B};
 static uint8_t USER_HEADER_MBR[16]  = {0x01, 0x00, 0x00, 0x04, 0x00, 0x02, 0x01, 0x57, 0x07, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x2A};
 
+// static uint8_t USER_Kc_MBR[16]  = {0xD2 ,0xC6 ,0x8F ,0xC2 ,0xEB ,0xA0 ,0x5B ,0x63 ,0x3F ,0x0B ,0xF8 ,0x7B ,0x46 ,0x0E ,0x0D ,0x93};
+// static uint8_t USER_Kbit_MBR[16]  = {0x83 ,0x1E ,0x4E ,0x4B ,0x42 ,0xCA ,0x7F ,0x39 ,0x0C ,0xB7 ,0xC5 ,0xFB ,0x81 ,0xB1 ,0x10 ,0xDA};
 static uint8_t USER_Kbit_MBR[16]  = {0x82, 0xf0, 0x29, 0xad, 0xe9, 0x53, 0x23, 0xf5, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa};
 static uint8_t USER_Kbit_FHDB[16] = {0x40, 0xe9, 0x80, 0x4d, 0x2e, 0x92, 0xb0, 0xa8, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa};
 static uint8_t USER_Kbit_FMCB[16] = {0xd9, 0x4a, 0x2e, 0x56, 0x01, 0x6e, 0xa7, 0x31, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa};
@@ -58,22 +60,22 @@ struct KELFHeader
 };
 
 // possible BitBlock.Flags. Other bit flags should be unset
-#define HDR_BLACKLIST 0x1    // Unset. if set then BitCount should be non-zero, and header will change its size
-#define HDR_WHITELIST 0x2    // Unset. maybe whitelist? ICVPS2 ??
-#define HDR_FLAG2     0x4    // Set. ??
-#define HDR_FLAG3     0x8    // Set. ??
-#define HDR_1DES      0x10   // Set in kirx. HDR_3DES should be unset. Represents Single DES encryption
-#define HDR_3DES      0x20   // Set in kelf. HDR_1DES should be unset. Represents Single DES encryption
-#define HDR_FLAG6     0x40   // Unset. ??
-#define HDR_FLAG7     0x80   // Unset. ??
-#define HDR_FLAG8     0x100  // Unset. ??
-#define HDR_FLAG9     0x200  // Unset. ??
-#define HDR_FLAG10     0x400  // Set. ??
-#define HDR_FLAG11     0x800  // Unset. ??
-#define HDR_FLAG12     0x1000 // Unset. ??
-#define HDR_FLAG13     0x2000 // Unset. ??
-#define HDR_FLAG14     0x4000 // Unset. ??
-#define HDR_FLAG15     0x8000 // Unset. ??
+#define HDR_FLAG0_BLACKLIST 0x1    // Unset. if set then BitCount should be non-zero, and header will change its size
+#define HDR_FLAG1_WHITELIST 0x2    // Unset. maybe whitelist? ICVPS2 ??
+#define HDR_FLAG2           0x4    // Set. ??
+#define HDR_FLAG3           0x8    // Set. ??
+#define HDR_FLAG4_1DES      0x10   // Set in kirx. HDR_FLAG4_3DES should be unset. Represents Single DES encryption
+#define HDR_FLAG4_3DES      0x20   // Set in kelf. HDR_FLAG4_1DES should be unset. Represents Single DES encryption
+#define HDR_FLAG6           0x40   // Unset. ??
+#define HDR_FLAG7           0x80   // Unset. ??
+#define HDR_FLAG8           0x100  // Unset. ??
+#define HDR_FLAG9           0x200  // Unset. ??
+#define HDR_FLAG10          0x400  // Set. ??
+#define HDR_FLAG11          0x800  // Unset. ??
+#define HDR_FLAG12          0x1000 // Unset. ??
+#define HDR_FLAG13          0x2000 // Unset. ??
+#define HDR_FLAG14          0x4000 // Unset. ??
+#define HDR_FLAG15          0x8000 // Unset. ??
 
 // MGZones region flags. If unset - blocked in that region
 #define REGION_JP   0x1  // Japan
@@ -114,7 +116,7 @@ class Kelf
     std::string Content;
 
 public:
-    Kelf(KeyStore &_ks)
+    explicit Kelf(KeyStore &_ks)
         : ks(_ks)
     {
     }

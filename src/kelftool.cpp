@@ -20,6 +20,8 @@
 #include "keystore.h"
 #include "kelf.h"
 
+// TODO: implement load/save kelf header configuration for byte-perfect encryption, decryption
+
 std::string getKeyStorePath()
 {
 #if defined(__linux__) || defined(__APPLE__)
@@ -39,8 +41,12 @@ int decrypt(int argc, char **argv)
     KeyStore ks;
     int ret = ks.Load(getKeyStorePath());
     if (ret != 0) {
-        printf("Failed to load keystore: %d - %s\n", ret, KeyStore::getErrorString(ret).c_str());
-        return ret;
+        // try to load keys from working directory
+        ret = ks.Load("./PS2KEYS.dat");
+        if (ret != 0) {
+            printf("Failed to load keystore: %d - %s\n", ret, KeyStore::getErrorString(ret).c_str());
+            return ret;
+        }
     }
 
     Kelf kelf(ks);
@@ -87,8 +93,12 @@ int encrypt(int argc, char **argv)
     KeyStore ks;
     int ret = ks.Load(getKeyStorePath());
     if (ret != 0) {
-        printf("Failed to load keystore: %d - %s\n", ret, KeyStore::getErrorString(ret).c_str());
-        return ret;
+        // try to load keys from working directory
+        ret = ks.Load("./PS2KEYS.dat");
+        if (ret != 0) {
+            printf("Failed to load keystore: %d - %s\n", ret, KeyStore::getErrorString(ret).c_str());
+            return ret;
+        }
     }
 
     Kelf kelf(ks);

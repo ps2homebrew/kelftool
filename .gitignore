@@ -333,4 +333,9 @@ ASALocalRun/
 build/
 .*
 *.kelf
+*.xlf
 *.elf
+*.KELF
+*.XLF
+*.ELF
+PS2KEYS.dat
