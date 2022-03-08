@@ -20,9 +20,11 @@
 #include "keystore.h"
 #include "kelf.h"
 
+// TODO: implement load/save kelf header configuration for byte-perfect encryption, decryption
+
 std::string getKeyStorePath()
 {
-#ifdef __linux__
+#if defined(__linux__) || defined(__APPLE__)
     return std::string(getenv("HOME")) + "/PS2KEYS.dat";
 #else
     return std::string(getenv("USERPROFILE")) + "\\PS2KEYS.dat";
@@ -39,8 +41,12 @@ int decrypt(int argc, char **argv)
     KeyStore ks;
     int ret = ks.Load(getKeyStorePath());
     if (ret != 0) {
-        printf("Failed to load keystore: %d - %s\n", ret, KeyStore::getErrorString(ret).c_str());
-        return ret;
+        // try to load keys from working directory
+        ret = ks.Load("./PS2KEYS.dat");
+        if (ret != 0) {
+            printf("Failed to load keystore: %d - %s\n", ret, KeyStore::getErrorString(ret).c_str());
+            return ret;
+        }
     }
 
     Kelf kelf(ks);
@@ -65,7 +71,7 @@ int encrypt(int argc, char **argv)
 
     if (argc < 4) {
         printf("%s encrypt <headerid> <input> <output>\n", argv[0]);
-        printf("<headerid>: fmcb,fhdb, mbr\n");
+        printf("<headerid>: fmcb, fhdb, mbr\n");
         return -1;
     }
 
@@ -87,12 +93,16 @@ int encrypt(int argc, char **argv)
     KeyStore ks;
     int ret = ks.Load(getKeyStorePath());
     if (ret != 0) {
-        printf("Failed to load keystore: %d - %s\n", ret, KeyStore::getErrorString(ret).c_str());
-        return ret;
+        // try to load keys from working directory
+        ret = ks.Load("./PS2KEYS.dat");
+        if (ret != 0) {
+            printf("Failed to load keystore: %d - %s\n", ret, KeyStore::getErrorString(ret).c_str());
+            return ret;
+        }
     }
 
     Kelf kelf(ks);
-    ret = kelf.LoadContent(argv[2]);
+    ret = kelf.LoadContent(argv[2], headerid);
     if (ret != 0) {
         printf("Failed to LoadContent!\n");
         return ret;
@@ -114,6 +124,12 @@ int main(int argc, char **argv)
         printf("Available submodules:\n");
         printf("\tdecrypt - decrypt and check signature of kelf files\n");
         printf("\tencrypt <headerid> - encrypt and sign kelf files <headerid>: fmcb, fhdb, mbr\n");
+        printf("\t\tfmcb - for retail PS2 memory cards\n");
+        printf("\t\tfhdb - for retail PS2 HDD (HDD OSD / BB Navigator)\n");
+        printf("\t\tmbr  - for retail PS2 HDD (mbr injection).\n");
+        printf("\t\t       Note: for mbr elf should load from 0x100000 and should be without headers:\n");
+        printf("\t\t       readelf -h <input_elf> should show 0x100000 or 0x100008\n");
+        printf("\t\t       $(EE_OBJCOPY) -O binary -v <input_elf> <headerless_elf>\n");
         return -1;
     }
 
