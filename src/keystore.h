@@ -36,6 +36,8 @@ class KeyStore
     std::string RootSignatureHashKey;
     std::string ContentTableIV;
     std::string ContentIV;
+    std::string ArcadeKbit;
+    std::string ArcadeKc;
 
 public:
     int Load(std::string filename);
@@ -50,6 +52,8 @@ public:
     std::string GetRootSignatureHashKey() { return RootSignatureHashKey; }
     std::string GetContentTableIV() { return ContentTableIV; }
     std::string GetContentIV() { return ContentIV; }
+    std::string GetArcadeKbit() { return ArcadeKbit; }
+    std::string GetArcadeKc() { return ArcadeKc; }
 
     static std::string getErrorString(int err);
 };

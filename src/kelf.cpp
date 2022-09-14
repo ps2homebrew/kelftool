@@ -256,6 +256,12 @@ int Kelf::LoadKelf(const std::string filename)
     for (size_t i = 0; i < 16; ++i)
         printf(" %02X", (unsigned char)Kc[i]);
 
+    // arcade
+    if (ks.GetArcadeKbit().size() && ks.GetArcadeKc().size()) {
+        memcpy(Kbit.data(), ks.GetArcadeKbit().data(), 16);
+        memcpy(Kc.data(), ks.GetArcadeKc().data(), 16);
+    }
+
     int BitTableSize = header.HeaderSize - ftell(f) - 8 - 8;
     printf("\nBitTableSize           = %#X\n", BitTableSize);
     if (BitTableSize > sizeof(BitTable)) {
@@ -367,6 +373,10 @@ int Kelf::SaveKelf(const std::string filename, int headerid)
         case 2:
             USER_HEADER = USER_HEADER_MBR;
             break;
+
+        default:
+            USER_HEADER = USER_HEADER_FHDB;
+            break;
     }
 
     memcpy(header.UserDefined, USER_HEADER, 16);
@@ -440,13 +450,19 @@ int Kelf::LoadContent(const std::string filename, int headerid)
 
     Kbit.resize(16);
     memcpy(Kbit.data(), USER_Kbit, 16);
+    // std::fill(Kbit.data(), Kbit.data() + 16, 0x00);
 
     // TODO: encrypted Kc hold some useful data
     Kc.resize(16);
-    // memset(Kc.data(), 0xBB, Kc.size());
-
     // memcpy(Kbit.data(), USER_Kc_MBR, 16);
-    std::fill(Kc.data(), Kc.data() + 16, 0xBB);
+    std::fill(Kc.data(), Kc.data() + 16, 0x00);
+
+    // arcade
+    if (ks.GetArcadeKbit().size() && ks.GetArcadeKc().size()) {
+        memcpy(Kbit.data(), ks.GetArcadeKbit().data(), 16);
+        memcpy(Kc.data(), ks.GetArcadeKc().data(), 16);
+    }
+
     std::fill(bitTable.gap, bitTable.gap + 3, 0);
 
     // You can create your own sets of files

@@ -4,11 +4,32 @@ An open-source utility for decrypting, encrypting and signing PS2/PSX DESR KELF 
 
 ## You need to bring your keys
 
-Place them at your home directory (%USERPROFILE%) in the "PS2KEYS.dat" file as a 'KEY=HEX_VALUE' pair.
+Place them in your home directory (%USERPROFILE%) in the "PS2KEYS.dat" file as a 'KEY=HEX_VALUE' pair. Or place them in your working directory.
+
+## Usage
+
+    decrypt - decrypt and check the signature of kelf files
+	encrypt <headerid> - encrypt and sign kelf files <headerid>: fmcb, fhdb, mbr
+		fmcb - for retail PS2 memory cards
+		fhdb - for retail PS2 HDD (HDD OSD / BB Navigator)
+		mbr  - for retail PS2 HDD (mbr injection).
+		       Note: for mbr, elf should load from 0x100000 and should be without headers:
+		       readelf -h <input_elf> should show 0x100000 or 0x100008
+headerless elf creation:
+
+      $(EE_OBJCOPY) -O binary -v <input_elf> <headerless_elf>
+examples:
+
+	kelftool encrypt fhdb input.elf output.kelf
+    kelftool decrypot input.kelf output.elf
+
+*decrypt* command will also print useful information about kelf
 
 ## SHA256 Hashes of the keys
 
 ### THESE ARE HASHES, NOT THE ACTUAL KEYS
+
+#### Retail
 
 **MG_SIG_MASTER_KEY**=*e6e41172c069b752b9e88d31c70606c580b1c15ee782abd83cf34117bfc47c91*
 **MG_SIG_HASH_KEY**=*0dc3a1e225d3e701cfd07c2b25e7a3cc661ded10870218f1f22f936ba350bef5*
@@ -20,3 +41,11 @@ Place them at your home directory (%USERPROFILE%) in the "PS2KEYS.dat" file as a
 **MG_ROOTSIG_HASH_KEY**=*5023ea32da5f595d15edf3aad08941dd96ae42a1ad32690a8ca35a024d758bd2*
 **MG_CONTENT_TABLE_IV**=*3d9ac39d6e1b69b076da20a38593b2f4ccdd5f943b991c99eacbea13cb1cf0a4*
 **MG_CONTENT_IV**=*4e3f5dfaf24c8016c60a23ced78af1e469522dbedb65ca7c8abfb990458f036b*
+
+#### Arcade
+
+Note: for arcade units (Namco System 246/256 and Konami Python 1) it is necessary to provide different keys and also additional keys: **ARCADE_KBIT** and **ARCADE_KC**
+
+#### Dev and proto
+
+For DTL units it is necessary to provide different keys (dev keystore). Proto keystore probably was never used.
