@@ -256,6 +256,12 @@ int Kelf::LoadKelf(const std::string filename)
     for (size_t i = 0; i < 16; ++i)
         printf(" %02X", (unsigned char)Kc[i]);
 
+    // arcade
+    if (ks.GetArcadeKbit().size() && ks.GetArcadeKc().size()) {
+        memcpy(Kbit.data(), ks.GetArcadeKbit().data(), 16);
+        memcpy(Kc.data(), ks.GetArcadeKc().data(), 16);
+    }
+
     int BitTableSize = header.HeaderSize - ftell(f) - 8 - 8;
     printf("\nBitTableSize           = %#X\n", BitTableSize);
     if (BitTableSize > sizeof(BitTable)) {
@@ -367,6 +373,10 @@ int Kelf::SaveKelf(const std::string filename, int headerid)
         case 2:
             USER_HEADER = USER_HEADER_MBR;
             break;
+
+        default:
+            USER_HEADER = USER_HEADER_FHDB;
+            break;
     }
 
     memcpy(header.UserDefined, USER_HEADER, 16);
@@ -433,20 +443,30 @@ int Kelf::LoadContent(const std::string filename, int headerid)
         case 2:
             USER_Kbit = USER_Kbit_MBR;
             break;
+        default:
+            USER_Kbit = USER_Kbit_FHDB;
+            break;
     }
 
     Kbit.resize(16);
     memcpy(Kbit.data(), USER_Kbit, 16);
+    // std::fill(Kbit.data(), Kbit.data() + 16, 0x00);
 
     // TODO: encrypted Kc hold some useful data
     Kc.resize(16);
-    // memset(Kc.data(), 0xBB, Kc.size());
-
     // memcpy(Kbit.data(), USER_Kc_MBR, 16);
-    std::fill(Kc.data(), Kc.data() + 16, 0xBB);
+    std::fill(Kc.data(), Kc.data() + 16, 0x00);
+
+    // arcade
+    if (ks.GetArcadeKbit().size() && ks.GetArcadeKc().size()) {
+        memcpy(Kbit.data(), ks.GetArcadeKbit().data(), 16);
+        memcpy(Kc.data(), ks.GetArcadeKc().data(), 16);
+    }
+
     std::fill(bitTable.gap, bitTable.gap + 3, 0);
 
     // You can create your own sets of files
+    // at least 2 blocks, seems at least 1 block should be signed for kirx, at least 1 block should be signed and encrypted for kefl
     // BlockCount - will be number of blocks (0-255)
     // Blocks[i].Flags can be any combination of BIT_BLOCK_SIGNED and BIT_BLOCK_ENCRYPTED flags (4 different sets)
     // Blocks[i].Size - block size, should be division of 8 if BIT_BLOCK_ENCRYPTED is set
@@ -457,6 +477,12 @@ int Kelf::LoadContent(const std::string filename, int headerid)
     // bitTable.Blocks[0].Flags = BIT_BLOCK_SIGNED | BIT_BLOCK_ENCRYPTED;
     // bitTable.Blocks[1].Size  = Content.size() - bitTable.Blocks[0].Size;
     // bitTable.Blocks[1].Flags = 0;
+
+    bitTable.BlockCount      = 2;
+    bitTable.Blocks[0].Size  = Content.size() - 0x10;
+    bitTable.Blocks[0].Flags = 0;
+    bitTable.Blocks[1].Size  = 0x10;
+    bitTable.Blocks[1].Flags = BIT_BLOCK_SIGNED | BIT_BLOCK_ENCRYPTED;
 
     // bitTable.BlockCount      = 1;
     // bitTable.Blocks[0].Size  = 0x20;
@@ -476,11 +502,6 @@ int Kelf::LoadContent(const std::string filename, int headerid)
     // bitTable.Blocks[5].Size  = 0x100;
     // bitTable.Blocks[5].Flags = BIT_BLOCK_ENCRYPTED;
 
-    // fastest solution, 1 block without signing and encryption
-    bitTable.BlockCount      = 1;
-    bitTable.Blocks[0].Size  = Content.size();
-    bitTable.Blocks[0].Flags = 0;
-
     uint32_t offset = 0;
     for (int i = 0; i < bitTable.BlockCount; ++i) {
         // ignore last block defined size, and just use the rest of elf
@@ -488,7 +509,7 @@ int Kelf::LoadContent(const std::string filename, int headerid)
         if ((i == bitTable.BlockCount - 1) || (offset + bitTable.Blocks[i].Size > Content.size())) {
             bitTable.Blocks[i].Size = Content.size() - offset;
             bitTable.BlockCount     = i + 1;
-            // TODO: zero padding last block, 8 bytes if signed, 16 bytes if encrypted
+            // TODO: zero padding last block, 0x8 bytes if signed, 0x10 bytes if encrypted
         }
 
         memset(bitTable.Blocks[i].Signature, 0, 8);

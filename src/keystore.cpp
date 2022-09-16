@@ -96,6 +96,10 @@ int KeyStore::Load(std::string filename)
             ContentTableIV = value;
         if (key == "MG_CONTENT_IV")
             ContentIV = value;
+        if (key == "ARCADE_KBIT")
+            ArcadeKbit = value;
+        if (key == "ARCADE_KC")
+            ArcadeKc = value;
     }
 
     if (SignatureMasterKey.size() == 0 || SignatureHashKey.size() == 0 ||
