@@ -85,8 +85,9 @@ jobs:
           automatic_release_tag: "latest"
           title: "Development build"
           files: |
-            *.tar.gz
-            *.exe
+            kelftool-linux/*
+            kelftool-macos/*
+            kelftool-windows/*
 
       - name: Create Tagged Release Draft
         if: startsWith(github.ref, 'refs/tags/v')
@@ -96,5 +97,6 @@ jobs:
           prerelease: false
           draft: true
           files: |
-            *.tar.gz
-            *.exe
+            kelftool-linux/*
+            kelftool-macos/*
+            kelftool-windows/*
