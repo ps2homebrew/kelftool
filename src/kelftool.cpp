@@ -66,13 +66,22 @@ int decrypt(int argc, char **argv)
 
 int encrypt(int argc, char **argv)
 {
-
+    int systype = SYSTEM_TYPE_PS2;
     int headerid = -1;
 
     if (argc < 4) {
         printf("%s encrypt <headerid> <input> <output>\n", argv[0]);
         printf("<headerid>: fmcb, fhdb, mbr\n");
         return -1;
+    }
+    if (argc > 4)
+    {
+        for (int x = 4; x < argc; x++)
+        {
+            if (!strcmp(argv[x], "--PSX"))
+                systype = SYSTEM_TYPE_PSX;
+        }
+        
     }
 
     if (strcmp("fmcb", argv[1]) == 0)
@@ -108,7 +117,7 @@ int encrypt(int argc, char **argv)
         return ret;
     }
 
-    ret = kelf.SaveKelf(argv[3], headerid);
+    ret = kelf.SaveKelf(argv[3], headerid, systype);
     if (ret != 0) {
         printf("Failed to SaveKelf!\n");
         return ret;
@@ -123,11 +132,14 @@ int main(int argc, char **argv)
         printf("usage: %s <submodule> <args>\n", argv[0]);
         printf("Available submodules:\n");
         printf("\tdecrypt - decrypt and check signature of kelf files\n");
-        printf("\tencrypt <headerid> - encrypt and sign kelf files <headerid>: fmcb, fhdb, mbr\n");
-        printf("\t\tfmcb - for retail PS2 memory cards\n");
-        printf("\t\tfhdb - for retail PS2 HDD (HDD OSD / BB Navigator)\n");
-        printf("\t\tmbr  - for retail PS2 HDD (mbr injection).\n");
-        printf("\t\t       Note: for mbr elf should load from 0x100000 and should be without headers:\n");
+        printf("\tencrypt <headerid> <input KELF> <output KELF> [FLAGS] - encrypt and sign kelf files <headerid>: fmcb, fhdb, mbr\n");
+        printf("\t\theaderid:\n");
+        printf("\t\t\t- fmcb : for retail PS2 memory cards\n");
+        printf("\t\t\t- fhdb : for retail PS2 HDD (HDD OSD / BB Navigator)\n");
+        printf("\t\t\t- mbr  : for retail PS2 HDD (mbr injection).\n");
+        printf("\t\tFLAGS:\n");
+        printf("\t\t\t- --PSX : use PSX system type for KELF instead of PS2 system type\n");
+        printf("\n\t\t       Note: for mbr elf should load from 0x100000 and should be without headers:\n");
         printf("\t\t       readelf -h <input_elf> should show 0x100000 or 0x100008\n");
         printf("\t\t       $(EE_OBJCOPY) -O binary -v <input_elf> <headerless_elf>\n");
         return -1;

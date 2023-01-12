@@ -350,7 +350,7 @@ int Kelf::LoadKelf(const std::string filename)
     return 0;
 }
 
-int Kelf::SaveKelf(const std::string filename, int headerid)
+int Kelf::SaveKelf(const std::string filename, int headerid, int systype)
 {
     FILE *f = fopen(filename.c_str(), "wb");
     if (f == NULL) {
@@ -382,7 +382,7 @@ int Kelf::SaveKelf(const std::string filename, int headerid)
     memcpy(header.UserDefined, USER_HEADER, 16);
     header.ContentSize     = Content.size();      // sometimes zero
     header.HeaderSize      = bitTable.HeaderSize; // header + header signature + kbit + kc + bittable + bittable signature + root signature
-    header.SystemType      = SYSTEM_TYPE_PS2;     // same for COH (arcade)
+    header.SystemType      = systype;     // same for COH (arcade)
     header.ApplicationType = 1;                   // 1 = xosdmain, 5 = dvdplayer kirx 7 = dvdplayer kelf 0xB - ?? 0x00 - ??
     // TODO: implement and check 3DES/1DES difference based on header.Flags. In both - encryption and decryption.
     header.Flags    = 0x022C; // ?? 00000010 00101100 binary, 0x021C for kirx

@@ -120,7 +120,7 @@ public:
     }
 
     int LoadKelf(std::string filename);
-    int SaveKelf(std::string filename, int header);
+    int SaveKelf(std::string filename, int header, int systype = SYSTEM_TYPE_PS2);
     int LoadContent(std::string filename, int header);
     int SaveContent(std::string filename);
 
