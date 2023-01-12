@@ -79,7 +79,10 @@ int encrypt(int argc, char **argv)
         for (int x = 4; x < argc; x++)
         {
             if (!strcmp(argv[x], "--PSX"))
-                systype = SYSTEM_TYPE_PSX;
+                {
+                    printf("Output KELF will have PSX system type\n");
+                    systype = SYSTEM_TYPE_PSX;
+                }
         }
         
     }
