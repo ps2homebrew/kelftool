@@ -67,7 +67,7 @@ int decrypt(int argc, char **argv)
 int encrypt(int argc, char **argv)
 {
 
-    int headerid = -1;
+    int headerid = HEADERID::INVALID;
 
     if (argc < 4) {
         printf("%s encrypt <headerid> <input> <output>\n", argv[0]);
@@ -76,15 +76,16 @@ int encrypt(int argc, char **argv)
     }
 
     if (strcmp("fmcb", argv[1]) == 0)
-        headerid = 0;
+        headerid = HEADERID::FMCB;
 
     if (strcmp("fhdb", argv[1]) == 0)
-        headerid = 1;
+        headerid = HEADERID::FHDB;
 
     if (strcmp("mbr", argv[1]) == 0)
-        headerid = 2;
+        headerid = HEADERID::MBR;
 
-    if (headerid == -1) {
+
+    if (headerid == HEADERID::INVALID) {
 
         printf("Invalid header: %s\n", argv[1]);
         return -1;

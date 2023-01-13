@@ -362,15 +362,15 @@ int Kelf::SaveKelf(const std::string filename, int headerid)
     static uint8_t *USER_HEADER;
 
     switch (headerid) {
-        case 0:
+        case HEADERID::FMCB:
             USER_HEADER = USER_HEADER_FMCB;
             break;
 
-        case 1:
+        case HEADERID::FHDB:
             USER_HEADER = USER_HEADER_FHDB;
             break;
 
-        case 2:
+        case HEADERID::MBR:
             USER_HEADER = USER_HEADER_MBR;
             break;
 
@@ -434,13 +434,13 @@ int Kelf::LoadContent(const std::string filename, int headerid)
     // TODO: encrypted Kbit hold some useful data
     static uint8_t *USER_Kbit;
     switch (headerid) {
-        case 0:
+        case HEADERID::FMCB:
             USER_Kbit = USER_Kbit_FMCB;
             break;
-        case 1:
+        case HEADERID::FHDB:
             USER_Kbit = USER_Kbit_FHDB;
             break;
-        case 2:
+        case HEADERID::MBR:
             USER_Kbit = USER_Kbit_MBR;
             break;
         default:
