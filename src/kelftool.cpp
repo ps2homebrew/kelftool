@@ -84,6 +84,8 @@ int encrypt(int argc, char **argv)
     if (strcmp("mbr", argv[1]) == 0)
         headerid = HEADERID::MBR;
 
+    if (strcmp("dnasload", argv[1]) == 0)
+        headerid = HEADERID::DNASLOAD;
 
     if (headerid == HEADERID::INVALID) {
 

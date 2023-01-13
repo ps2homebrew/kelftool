@@ -374,6 +374,10 @@ int Kelf::SaveKelf(const std::string filename, int headerid)
             USER_HEADER = USER_HEADER_MBR;
             break;
 
+        case HEADERID::DNASLOAD:
+            USER_HEADER = USER_HEADER_DNASLOAD;
+            break;
+
         default:
             USER_HEADER = USER_HEADER_FHDB;
             break;
@@ -442,6 +446,9 @@ int Kelf::LoadContent(const std::string filename, int headerid)
             break;
         case HEADERID::MBR:
             USER_Kbit = USER_Kbit_MBR;
+            break;
+        case HEADERID::DNASLOAD:
+            USER_Kbit = USER_Kbit_FMCB;
             break;
         default:
             USER_Kbit = USER_Kbit_FHDB;
