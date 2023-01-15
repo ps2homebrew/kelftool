@@ -126,10 +126,11 @@ int main(int argc, char **argv)
         printf("usage: %s <submodule> <args>\n", argv[0]);
         printf("Available submodules:\n");
         printf("\tdecrypt - decrypt and check signature of kelf files\n");
-        printf("\tencrypt <headerid> - encrypt and sign kelf files <headerid>: fmcb, fhdb, mbr\n");
-        printf("\t\tfmcb - for retail PS2 memory cards\n");
-        printf("\t\tfhdb - for retail PS2 HDD (HDD OSD / BB Navigator)\n");
-        printf("\t\tmbr  - for retail PS2 HDD (mbr injection).\n");
+        printf("\tencrypt <headerid> - encrypt and sign kelf files <headerid>: fmcb, dnasload, fhdb, mbr\n");
+        printf("\t\tfmcb     - for retail PS2 memory cards\n");
+        printf("\t\tdnasload - for retail PS2 memory cards (decrypts on both PS2 and PSX. some sort of 'universal KELF')\n");
+        printf("\t\tfhdb     - for retail PS2 HDD (HDD OSD / BB Navigator)\n");
+        printf("\t\tmbr      - for retail PS2 HDD (mbr injection).\n");
         printf("\t\t       Note: for mbr elf should load from 0x100000 and should be without headers:\n");
         printf("\t\t       readelf -h <input_elf> should show 0x100000 or 0x100008\n");
         printf("\t\t       $(EE_OBJCOPY) -O binary -v <input_elf> <headerless_elf>\n");
