@@ -431,6 +431,19 @@ int Kelf::LoadContent(const std::string filename, int headerid)
     fread(Content.data(), 1, Content.size(), f);
     fclose(f);
 
+    // Count trailing zeroes in Content
+    size_t trailingZeroes = 0;
+    for (size_t i = Content.size(); (i > (Content.size()) - 0x18) && Content[i - 1] == 0; --i) {
+        ++trailingZeroes;
+    }
+
+    // remove at least 0x18 trailing zeroes
+    // Add padding so file size is divided by 8.
+    // After that add 0x10 zero bytes at the end, so encrypted block does not contain elf data
+    size_t origSize = Content.size();
+    size_t newSize  = ((origSize - trailingZeroes) / 8 + 3) * 8; // Divide by 8, add 3 blocks, and multiply by 8
+    Content.resize(newSize, 0);
+
     // TODO: encrypted Kbit hold some useful data
     static uint8_t *USER_Kbit;
     switch (headerid) {
@@ -466,7 +479,10 @@ int Kelf::LoadContent(const std::string filename, int headerid)
     std::fill(bitTable.gap, bitTable.gap + 3, 0);
 
     // You can create your own sets of files
-    // at least 2 blocks, seems at least 1 block should be signed for kirx, at least 1 block should be signed and encrypted for kefl
+    // at least 2 blocks, seems at least 1 block should be signed
+
+    // TODO: fix BIT_BLOCK_SIGNED only code as signed only is faster
+
     // BlockCount - will be number of blocks (0-255)
     // Blocks[i].Flags can be any combination of BIT_BLOCK_SIGNED and BIT_BLOCK_ENCRYPTED flags (4 different sets)
     // Blocks[i].Size - block size, should be division of 8 if BIT_BLOCK_ENCRYPTED is set
@@ -478,11 +494,12 @@ int Kelf::LoadContent(const std::string filename, int headerid)
     // bitTable.Blocks[1].Size  = Content.size() - bitTable.Blocks[0].Size;
     // bitTable.Blocks[1].Flags = 0;
 
+    // we add 0x10 zero bytes to the end of elf file, so we encrypt them and still be able to see the main part of elf unencrypted
     bitTable.BlockCount      = 2;
-    bitTable.Blocks[0].Size  = Content.size() - 0x10;
-    bitTable.Blocks[0].Flags = 0;
     bitTable.Blocks[1].Size  = 0x10;
     bitTable.Blocks[1].Flags = BIT_BLOCK_SIGNED | BIT_BLOCK_ENCRYPTED;
+    bitTable.Blocks[0].Size  = Content.size() - bitTable.Blocks[1].Size;
+    bitTable.Blocks[0].Flags = 0;
 
     // bitTable.BlockCount      = 1;
     // bitTable.Blocks[0].Size  = 0x20;
