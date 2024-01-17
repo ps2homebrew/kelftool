@@ -84,7 +84,7 @@ void xor_bit(const void *a, const void *b, void *Result, size_t Length)
     }
 }
 
-int Kelf::LoadKelf(const std::string filename)
+int Kelf::LoadKelf(const std::string &filename)
 {
     FILE *f = fopen(filename.c_str(), "rb");
     if (f == NULL) {
@@ -350,7 +350,7 @@ int Kelf::LoadKelf(const std::string filename)
     return 0;
 }
 
-int Kelf::SaveKelf(const std::string filename, int headerid)
+int Kelf::SaveKelf(const std::string &filename, int headerid)
 {
     FILE *f = fopen(filename.c_str(), "wb");
     if (f == NULL) {
@@ -418,7 +418,7 @@ int Kelf::SaveKelf(const std::string filename, int headerid)
     return 0;
 }
 
-int Kelf::LoadContent(const std::string filename, int headerid)
+int Kelf::LoadContent(const std::string &filename, int headerid)
 {
     FILE *f = fopen(filename.c_str(), "rb");
     if (f == NULL) {
@@ -573,7 +573,7 @@ int Kelf::LoadContent(const std::string filename, int headerid)
     return 0;
 }
 
-int Kelf::SaveContent(const std::string filename)
+int Kelf::SaveContent(const std::string &filename)
 {
     FILE *f = fopen(filename.c_str(), "wb");
     if (f == NULL) {
@@ -615,7 +615,7 @@ std::string Kelf::DeriveKeyEncryptionKey(KELFHeader &header)
     return std::string((char *)KEK, 16);
 }
 
-void Kelf::DecryptKeys(const std::string KEK)
+void Kelf::DecryptKeys(const std::string &KEK)
 {
     TdesCbcCfb64Decrypt((uint8_t *)Kbit.data(), (uint8_t *)Kbit.data(), 8, (uint8_t *)KEK.data(), 2, MG_IV_NULL);
     TdesCbcCfb64Decrypt((uint8_t *)Kbit.data() + 8, (uint8_t *)Kbit.data() + 8, 8, (uint8_t *)KEK.data(), 2, MG_IV_NULL);
@@ -624,7 +624,7 @@ void Kelf::DecryptKeys(const std::string KEK)
     TdesCbcCfb64Decrypt((uint8_t *)Kc.data() + 8, (uint8_t *)Kc.data() + 8, 8, (uint8_t *)KEK.data(), 2, MG_IV_NULL);
 }
 
-void Kelf::EncryptKeys(const std::string KEK)
+void Kelf::EncryptKeys(const std::string &KEK)
 {
     TdesCbcCfb64Encrypt((uint8_t *)Kbit.data(), (uint8_t *)Kbit.data(), 8, (uint8_t *)KEK.data(), 2, MG_IV_NULL);
     TdesCbcCfb64Encrypt((uint8_t *)Kbit.data() + 8, (uint8_t *)Kbit.data() + 8, 8, (uint8_t *)KEK.data(), 2, MG_IV_NULL);
@@ -657,7 +657,7 @@ std::string Kelf::GetBitTableSignature()
     return std::string((char *)signature, 8);
 }
 
-std::string Kelf::GetRootSignature(const std::string HeaderSignature, const std::string BitTableSignature)
+std::string Kelf::GetRootSignature(const std::string &HeaderSignature, const std::string &BitTableSignature)
 {
     std::string Signatures;
     Signatures += HeaderSignature;

@@ -119,17 +119,17 @@ public:
     {
     }
 
-    int LoadKelf(std::string filename);
-    int SaveKelf(std::string filename, int header);
-    int LoadContent(std::string filename, int header);
-    int SaveContent(std::string filename);
+    int LoadKelf(const std::string &filename);
+    int SaveKelf(const std::string &filename, int header);
+    int LoadContent(const std::string &filename, int header);
+    int SaveContent(const std::string &filename);
 
     std::string GetHeaderSignature(KELFHeader &header);
     std::string DeriveKeyEncryptionKey(KELFHeader &header);
-    void DecryptKeys(std::string KEK);
-    void EncryptKeys(std::string KEK);
+    void DecryptKeys(const std::string &KEK);
+    void EncryptKeys(const std::string &KEK);
     std::string GetBitTableSignature();
-    std::string GetRootSignature(std::string HeaderSignature, std::string BitTableSignature);
+    std::string GetRootSignature(const std::string &HeaderSignature, const std::string &BitTableSignature);
     void DecryptContent(int keycount);
     int VerifyContentSignature();
 };
