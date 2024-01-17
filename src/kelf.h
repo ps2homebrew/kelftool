@@ -116,6 +116,7 @@ class Kelf
 public:
     explicit Kelf(KeyStore &_ks)
         : ks(_ks)
+        , bitTable()
     {
     }
 
