@@ -11,12 +11,12 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup msbuild
         uses: microsoft/setup-msbuild@v1.1
 
-      - run: choco install --no-progress --x86 openssl
+      - run: choco install openssl --no-progress --x86 --version=1.1.1.2100
 
       - name: Build
         run: msbuild /p:Configuration=Release
@@ -32,7 +32,7 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - run: brew install openssl
 
@@ -41,7 +41,7 @@ jobs:
           make
           tar -zcvf kelftool-macos.tar.gz build/kelftool
 
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: kelftool-macos
           path: kelftool-macos.tar.gz
@@ -52,7 +52,7 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - run: sudo apt-get install libssl-dev
 
@@ -71,10 +71,28 @@ jobs:
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/master'
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - name: Download kelftool artifacts
+      - name: Get short SHA and repository name
+        id: slug
+        run: |
+          echo "::set-output name=sha8::$(echo ${GITHUB_SHA} | cut -c1-8)"
+          echo "::set-output name=REPOSITORY_NAME::$(echo "$GITHUB_REPOSITORY" | awk -F / '{print $2}' | sed -e "s/:refs//")"
+
+      - name: Download kelftool-windows artifact
         uses: actions/download-artifact@v3
+        with:
+          name: kelftool-windows
+
+      - name: Download kelftool-macos artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: kelftool-macos
+
+      - name: Download kelftool-linux artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: kelftool-linux
 
       - name: Create pre-release
         if: github.ref == 'refs/heads/master'
@@ -85,9 +103,8 @@ jobs:
           automatic_release_tag: "latest"
           title: "Development build"
           files: |
-            kelftool-linux/*
-            kelftool-macos/*
-            kelftool-windows/*
+            *.tar.gz
+            *.exe
 
       - name: Create Tagged Release Draft
         if: startsWith(github.ref, 'refs/tags/v')
@@ -97,6 +114,5 @@ jobs:
           prerelease: false
           draft: true
           files: |
-            kelftool-linux/*
-            kelftool-macos/*
-            kelftool-windows/*
+            *.tar.gz
+            *.exe
