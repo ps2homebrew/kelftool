@@ -22,12 +22,10 @@
 #include "keystore.h"
 #include "kelf.h"
 
-struct _Overrides {
-    uint8_t Systemtype = SYSTEM_TYPE_PS2;
-    uint8_t MGZones = REGION_ALL_ALLOWED;
-    uint16_t Flags = HDR_PREDEF_KELF;
-    uint8_t ApplicationType;
-}Overrides;
+uint8_t GSystemtype = SYSTEM_TYPE_PS2;
+uint8_t GMGZones = REGION_ALL_ALLOWED;
+uint16_t GFlags = HDR_PREDEF_KELF;
+uint8_t GApplicationType;
 
 // TODO: implement load/save kelf header configuration for byte-perfect encryption, decryption
 
@@ -123,22 +121,21 @@ int encrypt(int argc, char **argv)
             const char* a = &argv[x][13];
             long t;
             if (!strcmp(a, "PS2")) {
-                Overrides::SystemType = SYSTEM_TYPE_PS2;
+                GSystemtype = SYSTEM_TYPE_PS2;
             } else if (!strcmp(a, "PSX")) {
-                Overrides::SystemType = SYSTEM_TYPE_PSX;
+                GSystemtype = SYSTEM_TYPE_PSX;
             } else if ((t = strtoul(a, NULL, 10))<UCHAR_MAX) {
-                Overrides::SystemType = (uint8_t)t;
+                GSystemtype = (uint8_t)t;
             }
-        }
         } else if (!strncmp("--kflags=", argv[x], strlen("--kflags="))) {
             const char* a = &argv[x][9];
             long t;
             if (!strcmp(a, "KELF")) {
-                Overrides::SystemType = SYSTEM_TYPE_PS2;
+                GSystemtype = SYSTEM_TYPE_PS2;
             } else if (!strcmp(a, "KIRX")) {
-                Overrides::SystemType = SYSTEM_TYPE_PSX;
+                GSystemtype = SYSTEM_TYPE_PSX;
             } else if ((t = strtoul(a, NULL, 10))<UCHAR_MAX) {
-                Overrides::SystemType = (uint8_t)t;
+                GSystemtype = (uint8_t)t;
             }
         }
     }

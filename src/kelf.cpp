@@ -351,7 +351,8 @@ int Kelf::LoadKelf(const std::string &filename)
 
     return 0;
 }
-extern Overrides;
+extern uint8_t GMGZones;
+extern uint16_t GFlags;
 
 int Kelf::SaveKelf(const std::string &filename, int headerid)
 {
@@ -395,8 +396,8 @@ int Kelf::SaveKelf(const std::string &filename, int headerid)
     header.SystemType      = SYSTEM_TYPE_PS2;     // same for COH (arcade)
     header.ApplicationType = 1;                   // 1 = xosdmain, 5 = dvdplayer kirx 7 = dvdplayer kelf 0xB - ?? 0x00 - ??
     // TODO: implement and check 3DES/1DES difference based on header.Flags. In both - encryption and decryption.
-    header.Flags    = Overrides.Flags; // ?? 00000010 00101100 binary, 0x021C for kirx
-    header.MGZones  = Overrides.MGZones;   // region bit, 1 - allowed
+    header.Flags    = GFlags; // ?? 00000010 00101100 binary, 0x021C for kirx
+    header.MGZones  = GMGZones;   // region bit, 1 - allowed
     header.BitCount = 0;
     // ?? balika, wisi: strange value, represents number of blacklisted iLinkID, ConsoleID
     // iLinkID (8 bytes), consoleID (8 bytes) placed between header.MGZones and HeaderSignature
