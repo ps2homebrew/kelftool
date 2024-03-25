@@ -16,9 +16,18 @@
  */
 #include <stdio.h>
 #include <string.h>
+#include <iostream>
+#include <limits.h>
 
 #include "keystore.h"
 #include "kelf.h"
+
+struct _Overrides {
+    uint8_t Systemtype = SYSTEM_TYPE_PS2;
+    uint8_t MGZones = REGION_ALL_ALLOWED;
+    uint16_t Flags = HDR_PREDEF_KELF;
+    uint8_t ApplicationType;
+}Overrides;
 
 // TODO: implement load/save kelf header configuration for byte-perfect encryption, decryption
 
@@ -33,16 +42,29 @@ std::string getKeyStorePath()
 
 int decrypt(int argc, char **argv)
 {
+    std::string KeyStoreEntry = "default";
+    
     if (argc < 3) {
         printf("%s decrypt <input> <output>\n", argv[0]);
         return -1;
     }
 
+    for (int x = 3; x < argc; x++)
+    {
+        if (!strncmp("--keys=", argv[x], strlen("--keys="))) {
+            KeyStoreEntry = &argv[x][7];
+#ifdef DEBUG
+        std::cout << "$DBG: Keystore entry set to '" << KeyStoreEntry << "'\n";
+#endif
+        }
+    }
+    
+
     KeyStore ks;
-    int ret = ks.Load(getKeyStorePath());
+    int ret = ks.Load("./PS2KEYS.dat", KeyStoreEntry);
     if (ret != 0) {
         // try to load keys from working directory
-        ret = ks.Load("./PS2KEYS.dat");
+        ret = ks.Load(getKeyStorePath(), KeyStoreEntry);
         if (ret != 0) {
             printf("Failed to load keystore: %d - %s\n", ret, KeyStore::getErrorString(ret).c_str());
             return ret;
@@ -66,8 +88,8 @@ int decrypt(int argc, char **argv)
 
 int encrypt(int argc, char **argv)
 {
-
-    int headerid = -1;
+    std::string KeyStoreEntry = "default";
+    int headerid = HEADER::INVALID;
 
     if (argc < 4) {
         printf("%s encrypt <headerid> <input> <output>\n", argv[0]);
@@ -76,13 +98,16 @@ int encrypt(int argc, char **argv)
     }
 
     if (strcmp("fmcb", argv[1]) == 0)
-        headerid = 0;
+        headerid = HEADER::FMCB;
 
     if (strcmp("fhdb", argv[1]) == 0)
-        headerid = 1;
+        headerid = HEADER::FHDB;
 
     if (strcmp("mbr", argv[1]) == 0)
-        headerid = 2;
+        headerid = HEADER::MBR;
+
+    if (strcmp("dnasload", argv[1]) == 0)
+        headerid = HEADER::DNASLOAD;
 
     if (headerid == -1) {
 
@@ -90,11 +115,39 @@ int encrypt(int argc, char **argv)
         return -1;
     }
 
+    for (int x = 5; x < argc; x++)
+    {
+        if (!strncmp("--keys=", argv[x], strlen("--keys="))) {
+            KeyStoreEntry = &argv[x][7];
+        } else if (!strncmp("--systemtype=", argv[x], strlen("--systemtype="))) {
+            const char* a = &argv[x][13];
+            long t;
+            if (!strcmp(a, "PS2")) {
+                Overrides::SystemType = SYSTEM_TYPE_PS2;
+            } else if (!strcmp(a, "PSX")) {
+                Overrides::SystemType = SYSTEM_TYPE_PSX;
+            } else if ((t = strtoul(a, NULL, 10))<UCHAR_MAX) {
+                Overrides::SystemType = (uint8_t)t;
+            }
+        }
+        } else if (!strncmp("--kflags=", argv[x], strlen("--kflags="))) {
+            const char* a = &argv[x][9];
+            long t;
+            if (!strcmp(a, "KELF")) {
+                Overrides::SystemType = SYSTEM_TYPE_PS2;
+            } else if (!strcmp(a, "KIRX")) {
+                Overrides::SystemType = SYSTEM_TYPE_PSX;
+            } else if ((t = strtoul(a, NULL, 10))<UCHAR_MAX) {
+                Overrides::SystemType = (uint8_t)t;
+            }
+        }
+    }
+
     KeyStore ks;
-    int ret = ks.Load(getKeyStorePath());
+    int ret = ks.Load("./PS2KEYS.dat", KeyStoreEntry);
     if (ret != 0) {
         // try to load keys from working directory
-        ret = ks.Load("./PS2KEYS.dat");
+        ret = ks.Load(getKeyStorePath(), KeyStoreEntry);
         if (ret != 0) {
             printf("Failed to load keystore: %d - %s\n", ret, KeyStore::getErrorString(ret).c_str());
             return ret;
@@ -117,6 +170,8 @@ int encrypt(int argc, char **argv)
     return 0;
 }
 
+
+
 int main(int argc, char **argv)
 {
     if (argc < 2) {
@@ -124,12 +179,13 @@ int main(int argc, char **argv)
         printf("Available submodules:\n");
         printf("\tdecrypt - decrypt and check signature of kelf files\n");
         printf("\tencrypt <headerid> - encrypt and sign kelf files <headerid>: fmcb, fhdb, mbr\n");
-        printf("\t\tfmcb - for retail PS2 memory cards\n");
-        printf("\t\tfhdb - for retail PS2 HDD (HDD OSD / BB Navigator)\n");
-        printf("\t\tmbr  - for retail PS2 HDD (mbr injection).\n");
-        printf("\t\t       Note: for mbr elf should load from 0x100000 and should be without headers:\n");
-        printf("\t\t       readelf -h <input_elf> should show 0x100000 or 0x100008\n");
-        printf("\t\t       $(EE_OBJCOPY) -O binary -v <input_elf> <headerless_elf>\n");
+        printf("\t\tfmcb     - for retail PS2 memory cards\n");
+        printf("\t\tdnasload - for retail PS2 memory cards (PSX Whitelist)\n");
+        printf("\t\tfhdb     - for retail PS2 HDD (HDD OSD / BB Navigator)\n");
+        printf("\t\tmbr      - for retail PS2 HDD (mbr injection).\n");
+        printf("\t\t          Note: for mbr elf should load from 0x100000 and should be without headers:\n");
+        printf("\t\t          readelf -h <input_elf> should show 0x100000 or 0x100008\n");
+        printf("\t\t          $(EE_OBJCOPY) -O binary -v <input_elf> <headerless_elf>\n");
         return -1;
     }
 
