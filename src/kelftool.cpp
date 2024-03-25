@@ -25,7 +25,7 @@
 uint8_t GSystemtype = SYSTEM_TYPE_PS2;
 uint8_t GMGZones = REGION_ALL_ALLOWED;
 uint16_t GFlags = HDR_PREDEF_KELF;
-uint8_t GApplicationType;
+uint8_t GApplicationType = KELFTYPE_XOSDMAIN;
 
 // TODO: implement load/save kelf header configuration for byte-perfect encryption, decryption
 
@@ -136,6 +136,18 @@ int encrypt(int argc, char **argv)
                 GSystemtype = SYSTEM_TYPE_PSX;
             } else if ((t = strtoul(a, NULL, 10))<UCHAR_MAX) {
                 GSystemtype = (uint8_t)t;
+            }
+        } else if (!strncmp("--mgzone=", argv[x], strlen("--mgzone="))) {
+            const char* a = &argv[x][9];
+            long t;
+            if ((t = strtoul(a, NULL, 10))<UCHAR_MAX) {
+                GMGZones = (uint8_t)t;
+            }
+        } else if (!strncmp("--apptype=", argv[x], strlen("--apptype="))) {
+            const char* a = &argv[x][9];
+            long t;
+            if ((t = strtoul(a, NULL, 10))<UCHAR_MAX) {
+                GApplicationType = (uint8_t)t;
             }
         }
     }

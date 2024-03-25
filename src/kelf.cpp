@@ -353,6 +353,7 @@ int Kelf::LoadKelf(const std::string &filename)
 }
 extern uint8_t GMGZones;
 extern uint16_t GFlags;
+extern uint8_t GApplicationType;
 
 int Kelf::SaveKelf(const std::string &filename, int headerid)
 {
@@ -394,7 +395,7 @@ int Kelf::SaveKelf(const std::string &filename, int headerid)
     header.ContentSize     = Content.size();      // sometimes zero
     header.HeaderSize      = bitTable.HeaderSize; // header + header signature + kbit + kc + bittable + bittable signature + root signature
     header.SystemType      = SYSTEM_TYPE_PS2;     // same for COH (arcade)
-    header.ApplicationType = 1;                   // 1 = xosdmain, 5 = dvdplayer kirx 7 = dvdplayer kelf 0xB - ?? 0x00 - ??
+    header.ApplicationType = GApplicationType;                   // 1 = xosdmain, 5 = dvdplayer kirx 7 = dvdplayer kelf 0xB - ?? 0x00 - ??
     // TODO: implement and check 3DES/1DES difference based on header.Flags. In both - encryption and decryption.
     header.Flags    = GFlags; // ?? 00000010 00101100 binary, 0x021C for kirx
     header.MGZones  = GMGZones;   // region bit, 1 - allowed
