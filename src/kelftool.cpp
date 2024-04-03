@@ -87,7 +87,7 @@ int encrypt(int argc, char **argv)
     int headerid = HEADER::INVALID;
     if (argc < 4) {
         printf("%s encrypt <headerid> <input> <output> [flags]\n", argv[0]);
-        printf("<headerid>: fmcb, fhdb, mbr\n");
+        printf("<headerid>: fmcb, fhdb, mbr, dnasload\n");
         return -1;
     }
 
@@ -103,8 +103,7 @@ int encrypt(int argc, char **argv)
     if (strcmp("dnasload", argv[1]) == 0)
         headerid = HEADER::DNASLOAD;
 
-    if (headerid == -1) {
-
+    if (headerid == HEADER::INVALID) {
         printf("Invalid header: %s\n", argv[1]);
         return -1;
     }
@@ -197,7 +196,7 @@ int main(int argc, char **argv)
         printf("usage: %s <submodule> <args>\n", argv[0]);
         printf("Available submodules:\n");
         printf("\tdecrypt - decrypt and check signature of kelf files\n");
-        printf("\tencrypt <headerid> - encrypt and sign kelf files <headerid>: fmcb, fhdb, mbr\n");
+        printf("\tencrypt <headerid> - encrypt and sign kelf files <headerid>: fmcb, fhdb, mbr, dnasload\n");
         printf("\t\tfmcb     - for retail PS2 memory cards\n");
         printf("\t\tdnasload - for retail PS2 memory cards (PSX Whitelisted)\n");
         printf("\t\tfhdb     - for retail PS2 HDD (HDD OSD / BB Navigator)\n");
