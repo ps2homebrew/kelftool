@@ -17,7 +17,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <iostream>
-#include <limits.h>
+#include <limits>
 
 #include "keystore.h"
 #include "kelf.h"
@@ -116,45 +116,51 @@ int encrypt(int argc, char **argv)
             KeyStoreEntry = &argv[x][7];
         } else if (!strncmp("--systemtype=", argv[x], strlen("--systemtype="))) {
             const char* a = &argv[x][13];
-            printf("- Custom SystemType %s\n", a);
             long t;
             if (!strcmp(a, "PS2")) {
                 GSystemtype = SYSTEM_TYPE_PS2;
             } else if (!strcmp(a, "PSX")) {
                 GSystemtype = SYSTEM_TYPE_PSX;
-            } else if ((t = strtoul(a, NULL, 10))<UCHAR_MAX) {
+            } else if ((t = strtoul(a, NULL, 10))<std::numeric_limits<std::uint8_t>::max()) {
                 GSystemtype = (uint8_t)t;
             }
         } else if (!strncmp("--kflags=", argv[x], strlen("--kflags="))) {
             const char* a = &argv[x][9];
-            printf("- Custom KELF Flags `%s`\n", a);
             unsigned long t;
             if (!strcmp(a, "KELF")) {
                 GFlags = HDR_PREDEF_KELF;
             } else if (!strcmp(a, "KIRX")) {
                 GFlags = HDR_PREDEF_KIRX;
-            } else if ((t = strtoul(a, NULL, 16))<UCHAR_MAX) {
+            } else if ((t = strtoul(a, NULL, 16))<std::numeric_limits<std::uint16_t>::max()) {
                 GFlags = (uint8_t)t;
             }
-                printf("0x%x\n\n", t);
 
         } else if (!strncmp("--mgzone=", argv[x], strlen("--mgzone="))) {
             const char* a = &argv[x][9];
-            printf("- Custom MagicGate Zones %s\n", a);
             long t;
-            if ((t = strtoul(a, NULL, 16))<UCHAR_MAX) {
+            if ((t = strtoul(a, NULL, 16))<std::numeric_limits<std::uint8_t>::max()) {
                 GMGZones = (uint8_t)t;
-                printf("%x\n", GMGZones);
             }
         } else if (!strncmp("--apptype=", argv[x], strlen("--apptype="))) {
             const char* a = &argv[x][10];
-            printf("- Custom Application Type %s\n", a);
             long t;
-            if ((t = strtoul(a, NULL, 16))<UCHAR_MAX) {
+            if ((t = strtoul(a, NULL, 16))<std::numeric_limits<std::uint8_t>::max()) {
                 GApplicationType = (uint8_t)t;
             }
         }
     }
+
+#ifdef DEBUG
+    printf(
+    "GSystemtype 0x%x\n"
+    "GMGZones 0x%x\n"
+    "GFlags 0x%x\n"
+    "GApplicationType 0x%x\n",
+    GSystemtype,
+    GMGZones,
+    GFlags,
+    GApplicationType);
+#endif
 
     KeyStore ks;
     int ret = ks.Load("./PS2KEYS.dat", KeyStoreEntry);
