@@ -43,7 +43,7 @@ int decrypt(int argc, char **argv)
     std::string KeyStoreEntry = "default";
     
     if (argc < 3) {
-        printf("%s decrypt <input> <output>\n", argv[0]);
+        printf("%s decrypt <input> <output> [flags]\n", argv[0]);
         return -1;
     }
 
@@ -51,9 +51,6 @@ int decrypt(int argc, char **argv)
     {
         if (!strncmp("--keys=", argv[x], strlen("--keys="))) {
             KeyStoreEntry = &argv[x][7];
-#ifdef DEBUG
-        std::cout << "$DBG: Keystore entry set to '" << KeyStoreEntry << "'\n";
-#endif
         }
     }
     
@@ -88,9 +85,8 @@ int encrypt(int argc, char **argv)
 {
     std::string KeyStoreEntry = "default";
     int headerid = HEADER::INVALID;
-
     if (argc < 4) {
-        printf("%s encrypt <headerid> <input> <output>\n", argv[0]);
+        printf("%s encrypt <headerid> <input> <output> [flags]\n", argv[0]);
         printf("<headerid>: fmcb, fhdb, mbr\n");
         return -1;
     }
@@ -113,12 +109,14 @@ int encrypt(int argc, char **argv)
         return -1;
     }
 
-    for (int x = 5; x < argc; x++)
+    for (int x = 4; x < argc; x++)
     {
         if (!strncmp("--keys=", argv[x], strlen("--keys="))) {
+            printf("- Custom keyset %s\n", &argv[x][7]);
             KeyStoreEntry = &argv[x][7];
         } else if (!strncmp("--systemtype=", argv[x], strlen("--systemtype="))) {
             const char* a = &argv[x][13];
+            printf("- Custom SystemType %s\n", a);
             long t;
             if (!strcmp(a, "PS2")) {
                 GSystemtype = SYSTEM_TYPE_PS2;
@@ -129,24 +127,30 @@ int encrypt(int argc, char **argv)
             }
         } else if (!strncmp("--kflags=", argv[x], strlen("--kflags="))) {
             const char* a = &argv[x][9];
-            long t;
+            printf("- Custom KELF Flags `%s`\n", a);
+            unsigned long t;
             if (!strcmp(a, "KELF")) {
-                GSystemtype = SYSTEM_TYPE_PS2;
+                GFlags = HDR_PREDEF_KELF;
             } else if (!strcmp(a, "KIRX")) {
-                GSystemtype = SYSTEM_TYPE_PSX;
-            } else if ((t = strtoul(a, NULL, 10))<UCHAR_MAX) {
-                GSystemtype = (uint8_t)t;
+                GFlags = HDR_PREDEF_KIRX;
+            } else if ((t = strtoul(a, NULL, 16))<UCHAR_MAX) {
+                GFlags = (uint8_t)t;
             }
+                printf("0x%x\n\n", t);
+
         } else if (!strncmp("--mgzone=", argv[x], strlen("--mgzone="))) {
             const char* a = &argv[x][9];
+            printf("- Custom MagicGate Zones %s\n", a);
             long t;
-            if ((t = strtoul(a, NULL, 10))<UCHAR_MAX) {
+            if ((t = strtoul(a, NULL, 16))<UCHAR_MAX) {
                 GMGZones = (uint8_t)t;
+                printf("%x\n", GMGZones);
             }
         } else if (!strncmp("--apptype=", argv[x], strlen("--apptype="))) {
-            const char* a = &argv[x][9];
+            const char* a = &argv[x][10];
+            printf("- Custom Application Type %s\n", a);
             long t;
-            if ((t = strtoul(a, NULL, 10))<UCHAR_MAX) {
+            if ((t = strtoul(a, NULL, 16))<UCHAR_MAX) {
                 GApplicationType = (uint8_t)t;
             }
         }
@@ -189,7 +193,7 @@ int main(int argc, char **argv)
         printf("\tdecrypt - decrypt and check signature of kelf files\n");
         printf("\tencrypt <headerid> - encrypt and sign kelf files <headerid>: fmcb, fhdb, mbr\n");
         printf("\t\tfmcb     - for retail PS2 memory cards\n");
-        printf("\t\tdnasload - for retail PS2 memory cards (PSX Whitelist)\n");
+        printf("\t\tdnasload - for retail PS2 memory cards (PSX Whitelisted)\n");
         printf("\t\tfhdb     - for retail PS2 HDD (HDD OSD / BB Navigator)\n");
         printf("\t\tmbr      - for retail PS2 HDD (mbr injection).\n");
         printf("\t\t          Note: for mbr elf should load from 0x100000 and should be without headers:\n");
