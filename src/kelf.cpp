@@ -19,6 +19,7 @@
 #include <errno.h>
 
 #include "kelf.h"
+#include "common.h"
 
 uint8_t MG_IV_NULL[8] = {0};
 
@@ -97,144 +98,147 @@ int Kelf::LoadKelf(const std::string &filename)
 
     if (header.Flags & 1 || header.Flags & 0xf0000 || header.BitCount != 0) {
         // TODO: check more unknown bit flags
-        printf("This file is not supported yet and looked after.\n");
+        printf(REDBOLD"This file is not supported yet and looked after.\n");
         printf("Please upload it and post it under that issue:\n");
-        printf("https://github.com/xfwcfw/kelftool/issues/1\n");
+        printf(YELBOLD"https://github.com/xfwcfw/kelftool/issues/1\n"DEFCOL);
         // fclose(f);
         // return KELF_ERROR_UNSUPPORTED_FILE;
     }
-    printf("header.UserDefined     =");
+    printf("header.UserDefined     ="YELLOW);
     for (size_t i = 0; i < sizeof(header.UserDefined); ++i)
         printf(" %02X", header.UserDefined[i]);
     if (!memcmp(header.UserDefined, USER_HEADER_FMCB, 16))
-        printf(" (FMCB)\n");
+        printf(GREEN" (FMCB)\n"DEFCOL);
     if (!memcmp(header.UserDefined, USER_HEADER_DNASLOAD, 16))
-        printf(" (DNASLOAD)\n");
+        printf(GREEN" (DNASLOAD)\n"DEFCOL);
     else if (!memcmp(header.UserDefined, USER_HEADER_FHDB, 16))
-        printf(" (FHDB)\n");
+        printf(GREEN" (FHDB)\n"DEFCOL);
     else if (!memcmp(header.UserDefined, USER_HEADER_MBR, 16))
-        printf(" (MBR)\n");
+        printf(GREEN" (MBR)\n"DEFCOL);
     else
-        printf("\n");
+        printf(DEFCOL" (UNKNOWN)\n");
 
-    printf("header.ContentSize     = %#X\n", header.ContentSize);
-    printf("header.HeaderSize      = %#X\n", header.HeaderSize);
+    printf("header.ContentSize     = "YELLOW"%#X\n"DEFCOL, header.ContentSize);
+    printf("header.HeaderSize      = "YELLOW"%#X\n"DEFCOL, header.HeaderSize);
+    printf("header.SystemType      = "YELLOW"%#X ", header.SystemType);
     switch (header.SystemType) {
         case 0:
-            printf("header.SystemType      = 0 (SYSTEM_TYPE_PS2)\n");
+            printf(GREEN"(SYSTEM_TYPE_PS2)"DEFCOL"\n");
             break;
         case 1:
-            printf("header.SystemType      = 1 (SYSTEM_TYPE_PSX)\n");
+            printf(GREEN"(SYSTEM_TYPE_PSX)"DEFCOL"\n");
             break;
         default:
-            printf("header.SystemType      = %#X\n", header.SystemType);
-            printf("    This value is unknown.\n");
+            printf(DEFCOL"(UNKNOWN)\n");
+            printf(REDBOLD"    This value is unknown.\n");
             printf("    Please upload file and post under that issue:\n");
-            printf("    https://github.com/xfwcfw/kelftool/issues/1\n");
+            printf(YELBOLD"    https://github.com/xfwcfw/kelftool/issues/1\n"DEFCOL);
             break;
     }
+
+    printf("header.ApplicationType = "YELLOW"%#X ", header.ApplicationType);
     switch (header.ApplicationType) {
         case KELFTYPE_DISC_WOOBLE:
-            printf("header.ApplicationType = 0 (disc wobble \?)\n");
+            printf(GREEN"(disc wobble \?)\n");
             break;
         case KELFTYPE_XOSDMAIN:
-            printf("header.ApplicationType = 1 (xosdmain)\n");
+            printf(GREEN"(xosdmain)\n");
             break;
         case KELFTYPE_DVDPLAYER_KIRX:
-            printf("header.ApplicationType = 5 (dvdplayer kirx)\n");
+            printf(GREEN"(dvdplayer kirx)\n");
             break;
         case KELFTYPE_DVDPLAYER_KELF:
-            printf("header.ApplicationType = 7 (dvdplayer kelf)\n");
+            printf(GREEN"(dvdplayer kelf)\n");
             break;
         case KELFTYPE_EARLY_MBR:
-            printf("header.ApplicationType = 11 (early mbr \?)\n");
+            printf(GREEN"(early mbr \?)\n");
             break;
         default:
-            printf("header.ApplicationType = %#X\n", header.ApplicationType);
-            printf("    This value is unknown.\n");
+            printf(DEFCOL"(UNKNOWN)\n");
+            printf(REDBOLD"    This value is unknown.\n");
             printf("    Please upload file and post under that issue:\n");
-            printf("    https://github.com/xfwcfw/kelftool/issues/1\n");
+            printf(YELBOLD"    https://github.com/xfwcfw/kelftool/issues/1\n"DEFCOL);
             break;
     }
-    printf("header.Flags           = %#X", header.Flags);
+    printf(DEFCOL"header.Flags           = "YELLOW"%#X "DEFCOL, header.Flags);
     if (header.Flags == HDR_PREDEF_KELF)
-        printf(" - kelf:");
+        printf(" - "GREENBOLD"kelf"DEFCOL":");
     else if (header.Flags == HDR_PREDEF_KIRX)
-        printf(" - kirx:");
+        printf(" - "GREENBOLD"kirx"DEFCOL":");
     else
-        printf(" - unknown:");
+        printf(" - "RED"unknown"DEFCOL":");
     if (header.Flags & HDR_FLAG0_BLACKLIST)
-        printf("HDR_FLAG0_BLACKLIST|");
+        printf(GREEN"HDR_FLAG0_BLACKLIST"DEFCOL"|");
     if (header.Flags & HDR_FLAG1_WHITELIST)
-        printf("HDR_FLAG1_WHITELIST|");
+        printf(GREEN"HDR_FLAG1_WHITELIST"DEFCOL"|");
     if (header.Flags & HDR_FLAG2)
-        printf("HDR_FLAG2|");
+        printf(GREEN"HDR_FLAG2"DEFCOL"|");
     if (header.Flags & HDR_FLAG3)
-        printf("HDR_FLAG3|");
+        printf(GREEN"HDR_FLAG3"DEFCOL"|");
     if (header.Flags & HDR_FLAG4_1DES)
-        printf("HDR_FLAG4_1DES|");
+        printf(GREEN"HDR_FLAG4_1DES"DEFCOL"|");
     if (header.Flags & HDR_FLAG4_3DES)
-        printf("HDR_FLAG4_3DES|");
+        printf(GREEN"HDR_FLAG4_3DES"DEFCOL"|");
     if (header.Flags & HDR_FLAG6)
-        printf("HDR_FLAG6|");
+        printf(GREEN"HDR_FLAG6"DEFCOL"|");
     if (header.Flags & HDR_FLAG7)
-        printf("HDR_FLAG7|");
+        printf(GREEN"HDR_FLAG7"DEFCOL"|");
     if (header.Flags & HDR_FLAG8)
-        printf("HDR_FLAG8|");
+        printf(GREEN"HDR_FLAG8"DEFCOL"|");
     if (header.Flags & HDR_FLAG9)
-        printf("HDR_FLAG9|");
+        printf(GREEN"HDR_FLAG9"DEFCOL"|");
     if (header.Flags & HDR_FLAG10)
-        printf("HDR_FLAG10|");
+        printf(GREEN"HDR_FLAG10"DEFCOL"|");
     if (header.Flags & HDR_FLAG11)
-        printf("HDR_FLAG11|");
+        printf(GREEN"HDR_FLAG11"DEFCOL"|");
     if (header.Flags & HDR_FLAG12)
-        printf("HDR_FLAG12|");
+        printf(GREEN"HDR_FLAG12"DEFCOL"|");
     if (header.Flags & HDR_FLAG13)
-        printf("HDR_FLAG13|");
+        printf(GREEN"HDR_FLAG13"DEFCOL"|");
     if (header.Flags & HDR_FLAG14)
-        printf("HDR_FLAG14|");
+        printf(GREEN"HDR_FLAG14"DEFCOL"|");
     if (header.Flags & HDR_FLAG15)
-        printf("HDR_FLAG15|");
+        printf(GREEN"HDR_FLAG15"DEFCOL"|");
     printf("\n");
 
-    printf("header.BitCount        = %#X\n", header.BitCount);
-    printf("header.MGZones         = %#X |", header.MGZones);
+    printf("header.BitCount        = "YELLOW"%#X \n"DEFCOL, header.BitCount);
+    printf("header.MGZones         = "YELLOW"%#X "DEFCOL" |", header.MGZones);
     if (header.MGZones == 0)
-        printf("All regions blocked (useless)|");
+        printf(REDBOLD"All regions blocked (useless)|"DEFCOL);
     else if (header.MGZones == REGION_ALL_ALLOWED)
-        printf("All regions allowed|");
+        printf(GREENBOLD"All regions allowed"DEFCOL"|");
     else {
         if (header.MGZones & REGION_JP)
-            printf("Japan|");
+            printf(GREEN"Japan"DEFCOL"|");
         if (header.MGZones & REGION_NA)
-            printf("North America|");
+            printf(GREEN"North America"DEFCOL"|");
         if (header.MGZones & REGION_EU)
-            printf("Europe|");
+            printf(GREEN"Europe"DEFCOL"|");
         if (header.MGZones & REGION_AU)
-            printf("Australia|");
+            printf(GREEN"Australia"DEFCOL"|");
         if (header.MGZones & REGION_ASIA)
-            printf("Asia|");
+            printf(GREEN"Asia"DEFCOL"|");
         if (header.MGZones & REGION_RU)
-            printf("Russia|");
+            printf(GREEN"Russia"DEFCOL"|");
         if (header.MGZones & REGION_CH)
-            printf("China|");
+            printf(GREEN"China"DEFCOL"|");
         if (header.MGZones & REGION_MX)
-            printf("Mexico|");
+            printf(GREEN"Mexico"DEFCOL"|");
     }
     printf("\n");
 
-    printf("header.gap             =");
+    printf("header.gap             ="YELLOW);
     for (unsigned int i = 0; i < 3; ++i)
         printf(" %02X", (unsigned char)header.gap[i]);
-    printf("\n");
+    printf(DEFCOL"\n");
 
     std::string HeaderSignature;
     HeaderSignature.resize(8);
     fread(HeaderSignature.data(), 1, HeaderSignature.size(), f);
-    printf("HeaderSignature        =");
+    printf("HeaderSignature        ="YELLOW);
     for (size_t i = 0; i < 8; ++i)
         printf(" %02X", (unsigned char)HeaderSignature[i]);
-    printf("\n");
+    printf(DEFCOL);
 
     if (HeaderSignature != GetHeaderSignature(header)) {
         fclose(f);
@@ -250,22 +254,23 @@ int Kelf::LoadKelf(const std::string &filename)
     fread(Kc.data(), 1, Kc.size(), f);
     DecryptKeys(KEK);
 
-    printf("\nKbit                   =");
+    printf("\nKbit                   ="YELLOW);
     for (size_t i = 0; i < 16; ++i)
         printf(" %02X", (unsigned char)Kbit[i]);
 
-    printf("\nKc                     =");
+    printf(DEFCOL"\nKc                     ="YELLOW);
     for (size_t i = 0; i < 16; ++i)
         printf(" %02X", (unsigned char)Kc[i]);
-
-    // arcade
+    printf(DEFCOL);
+    
     if (ks.GetOverrideKbit().size() && ks.GetOverrideKc().size()) {
+        printf("\n-- Kbit and Kc overriden by Keystore!");
         memcpy(Kbit.data(), ks.GetOverrideKbit().data(), 16);
         memcpy(Kc.data(), ks.GetOverrideKc().data(), 16);
     }
 
     int BitTableSize = header.HeaderSize - ftell(f) - 8 - 8;
-    printf("\nBitTableSize           = %#X\n", BitTableSize);
+    printf("\nBitTableSize           = "YELLOW"%#X\n"DEFCOL, BitTableSize);
     if (BitTableSize > sizeof(BitTable)) {
         fclose(f);
         return KELF_ERROR_INVALID_BIT_TABLE_SIZE;
@@ -274,34 +279,35 @@ int Kelf::LoadKelf(const std::string &filename)
     fread(&bitTable, 1, BitTableSize, f);
 
     TdesCbcCfb64Decrypt((uint8_t *)&bitTable, (uint8_t *)&bitTable, BitTableSize, (uint8_t *)Kbit.data(), 2, ks.GetContentTableIV().data());
-    printf("bitTable.HeaderSize    = %#X\n", bitTable.HeaderSize);
-    printf("bitTable.BlockCount    = %d\n", bitTable.BlockCount);
-    printf("bitTable.gap           =");
+    printf("bitTable.HeaderSize    = "YELLOW"%#X\n"DEFCOL, bitTable.HeaderSize);
+    printf("bitTable.BlockCount    = "YELLOW"%d\n"DEFCOL, bitTable.BlockCount);
+    printf("bitTable.gap           ="YELLOW);
     for (unsigned int i = 0; i < 3; ++i)
         printf(" %02X", (unsigned char)bitTable.gap[i]);
-    printf("\n                         Size        Signature           Flags\n");
+    printf(DEFCOL"\n                         Size        Signature           Flags\n");
     for (unsigned int i = 0; i < bitTable.BlockCount; ++i) {
-        printf("    bitTable.Blocks[%d] = %08X    ", (int)i, bitTable.Blocks[i].Size);
+        printf(DEFCOL"    bitTable.Blocks[%d] = "YELLOW"%08X    ", (int)i, bitTable.Blocks[i].Size);
         for (size_t j = 0; j < 8; ++j)
             printf("%02X", (unsigned char)bitTable.Blocks[i].Signature[j]);
+        printf("    %08X"DEFCOL, bitTable.Blocks[i].Flags);
         switch (bitTable.Blocks[i].Flags) {
             case 0:
-                printf("    0 (not encrypted, not signed)\n");
+                printf(" ("GREEN"not encrypted, not signed"DEFCOL")\n");
                 break;
             case 1:
-                printf("    1 (encrypted only)\n");
+                printf(" ("GREEN"encrypted only"DEFCOL")\n");
                 break;
             case 2:
-                printf("    2 (signed only)\n");
+                printf(" ("GREEN"signed only"DEFCOL")\n");
                 break;
             case 3:
-                printf("    3 (encrypted and signed)\n");
+                printf(" ("GREEN"encrypted and signed"DEFCOL")\n");
                 break;
             default:
-                printf("    %08X (unknown set of flags\n)", bitTable.Blocks[i].Flags);
-                printf("This value is unknown.\n");
+                printf(" (unknown set of flags)\n");
+                printf(REDBOLD"This value is unknown.\n");
                 printf("Please upload file and post under that issue:\n");
-                printf("https://github.com/xfwcfw/kelftool/issues/1\n");
+                printf(YELBOLD"https://github.com/xfwcfw/kelftool/issues/1\n"DEFCOL);
                 break;
         }
     }
@@ -310,10 +316,10 @@ int Kelf::LoadKelf(const std::string &filename)
     std::string BitTableSignature;
     BitTableSignature.resize(8);
     fread(BitTableSignature.data(), 1, BitTableSignature.size(), f);
-    printf("BitTableSignature      =");
+    printf("BitTableSignature      ="YELLOW);
     for (size_t i = 0; i < 8; ++i)
         printf(" %02X", (unsigned char)BitTableSignature[i]);
-    printf("\n");
+    printf(DEFCOL"\n");
 
     if (BitTableSignature != GetBitTableSignature()) {
         fclose(f);
@@ -324,10 +330,10 @@ int Kelf::LoadKelf(const std::string &filename)
     RootSignature.resize(8);
     fread(RootSignature.data(), 1, RootSignature.size(), f);
     if (RootSignature != GetRootSignature(HeaderSignature, BitTableSignature)) {
-        printf("\nWARNING: RootSignature does not match         =");
+        printf(YELBOLD"\nWARNING: RootSignature does not match         =");
         for (size_t i = 0; i < 8; ++i)
             printf(" %02X", (unsigned char)RootSignature[i]);
-        printf("\n");
+        printf(DEFCOL"\n");
 
         // fclose(f);
         // return KELF_ERROR_INVALID_ROOT_SIGNATURE;
@@ -342,7 +348,7 @@ int Kelf::LoadKelf(const std::string &filename)
     DecryptContent(header.Flags >> 4 & 3);
 
     if (VerifyContentSignature() != 0) {
-        printf("WARNING: VerifyContentSignature does not match\n");
+        printf(YELBOLD"WARNING: VerifyContentSignature does not match\n"DEFCOL);
         fclose(f);
         return KELF_ERROR_INVALID_CONTENT_SIGNATURE;
     }
@@ -351,6 +357,7 @@ int Kelf::LoadKelf(const std::string &filename)
 
     return 0;
 }
+extern uint8_t GSystemtype;
 extern uint8_t GMGZones;
 extern uint16_t GFlags;
 extern uint8_t GApplicationType;
@@ -386,7 +393,7 @@ int Kelf::SaveKelf(const std::string &filename, int headerid)
             break;
 
         default:
-            printf("WARNING: unknown header ID (%d) defaulting to FHDB ID\n", headerid);
+            printf(YELLOW"WARNING: unknown header ID (%d) defaulting to FHDB ID\n"DEFCOL, headerid);
             USER_HEADER = USER_HEADER_FHDB;
             break;
     }
@@ -394,7 +401,7 @@ int Kelf::SaveKelf(const std::string &filename, int headerid)
     memcpy(header.UserDefined, USER_HEADER, 16);
     header.ContentSize     = Content.size();      // sometimes zero
     header.HeaderSize      = bitTable.HeaderSize; // header + header signature + kbit + kc + bittable + bittable signature + root signature
-    header.SystemType      = SYSTEM_TYPE_PS2;     // same for COH (arcade)
+    header.SystemType      = GSystemtype;     // same for COH (arcade)
     header.ApplicationType = GApplicationType;                   // 1 = xosdmain, 5 = dvdplayer kirx 7 = dvdplayer kelf 0xB - ?? 0x00 - ??
     // TODO: implement and check 3DES/1DES difference based on header.Flags. In both - encryption and decryption.
     header.Flags    = GFlags; // ?? 00000010 00101100 binary, 0x021C for kirx
@@ -486,6 +493,7 @@ int Kelf::LoadContent(const std::string &filename, int headerid)
 
     // arcade
     if (ks.GetOverrideKbit().size() && ks.GetOverrideKc().size()) {
+        printf("-- Kbit and Kc overriden by Keystore!\n");
         memcpy(Kbit.data(), ks.GetOverrideKbit().data(), 16);
         memcpy(Kc.data(), ks.GetOverrideKc().data(), 16);
     }
