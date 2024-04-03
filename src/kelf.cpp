@@ -98,144 +98,144 @@ int Kelf::LoadKelf(const std::string &filename)
 
     if (header.Flags & 1 || header.Flags & 0xf0000 || header.BitCount != 0) {
         // TODO: check more unknown bit flags
-        printf(REDBOLD"This file is not supported yet and looked after.\n");
+        printf(REDBOLD "This file is not supported yet and looked after.\n");
         printf("Please upload it and post it under that issue:\n");
-        printf(YELBOLD"https://github.com/xfwcfw/kelftool/issues/1\n"DEFCOL);
+        printf(YELBOLD "https://github.com/xfwcfw/kelftool/issues/1\n" DEFCOL);
         // fclose(f);
         // return KELF_ERROR_UNSUPPORTED_FILE;
     }
-    printf("header.UserDefined     ="YELLOW);
+    printf("header.UserDefined     =" YELLOW);
     for (size_t i = 0; i < sizeof(header.UserDefined); ++i)
         printf(" %02X", header.UserDefined[i]);
     if (!memcmp(header.UserDefined, USER_HEADER_FMCB, 16))
-        printf(GREEN" (FMCB)\n"DEFCOL);
+        printf(GREEN " (FMCB)\n" DEFCOL);
     if (!memcmp(header.UserDefined, USER_HEADER_DNASLOAD, 16))
-        printf(GREEN" (DNASLOAD)\n"DEFCOL);
+        printf(GREEN " (DNASLOAD)\n" DEFCOL);
     else if (!memcmp(header.UserDefined, USER_HEADER_FHDB, 16))
-        printf(GREEN" (FHDB)\n"DEFCOL);
+        printf(GREEN " (FHDB)\n" DEFCOL);
     else if (!memcmp(header.UserDefined, USER_HEADER_MBR, 16))
-        printf(GREEN" (MBR)\n"DEFCOL);
+        printf(GREEN " (MBR)\n" DEFCOL);
     else
-        printf(DEFCOL" (UNKNOWN)\n");
+        printf(DEFCOL " (UNKNOWN)\n");
 
-    printf("header.ContentSize     = "YELLOW"%#X\n"DEFCOL, header.ContentSize);
-    printf("header.HeaderSize      = "YELLOW"%#X\n"DEFCOL, header.HeaderSize);
-    printf("header.SystemType      = "YELLOW"%#X ", header.SystemType);
+    printf("header.ContentSize     = " YELLOW "%#X\n" DEFCOL, header.ContentSize);
+    printf("header.HeaderSize      = " YELLOW "%#X\n" DEFCOL, header.HeaderSize);
+    printf("header.SystemType      = " YELLOW "%#X ", header.SystemType);
     switch (header.SystemType) {
         case 0:
-            printf(GREEN"(SYSTEM_TYPE_PS2)"DEFCOL"\n");
+            printf(GREEN "(SYSTEM_TYPE_PS2)" DEFCOL "\n");
             break;
         case 1:
-            printf(GREEN"(SYSTEM_TYPE_PSX)"DEFCOL"\n");
+            printf(GREEN "(SYSTEM_TYPE_PSX)" DEFCOL "\n");
             break;
         default:
-            printf(DEFCOL"(UNKNOWN)\n");
-            printf(REDBOLD"    This value is unknown.\n");
+            printf(DEFCOL "(UNKNOWN)\n");
+            printf(REDBOLD "    This value is unknown.\n");
             printf("    Please upload file and post under that issue:\n");
-            printf(YELBOLD"    https://github.com/xfwcfw/kelftool/issues/1\n"DEFCOL);
+            printf(YELBOLD "    https://github.com/xfwcfw/kelftool/issues/1\n" DEFCOL);
             break;
     }
 
-    printf("header.ApplicationType = "YELLOW"%#X ", header.ApplicationType);
+    printf("header.ApplicationType = " YELLOW "%#X ", header.ApplicationType);
     switch (header.ApplicationType) {
         case KELFTYPE_DISC_WOOBLE:
-            printf(GREEN"(disc wobble \?)\n");
+            printf(GREEN "(disc wobble \?)\n");
             break;
         case KELFTYPE_XOSDMAIN:
-            printf(GREEN"(xosdmain)\n");
+            printf(GREEN "(xosdmain)\n");
             break;
         case KELFTYPE_DVDPLAYER_KIRX:
-            printf(GREEN"(dvdplayer kirx)\n");
+            printf(GREEN "(dvdplayer kirx)\n");
             break;
         case KELFTYPE_DVDPLAYER_KELF:
-            printf(GREEN"(dvdplayer kelf)\n");
+            printf(GREEN "(dvdplayer kelf)\n");
             break;
         case KELFTYPE_EARLY_MBR:
-            printf(GREEN"(early mbr \?)\n");
+            printf(GREEN "(early mbr \?)\n");
             break;
         default:
-            printf(DEFCOL"(UNKNOWN)\n");
-            printf(REDBOLD"    This value is unknown.\n");
+            printf(DEFCOL "(UNKNOWN)\n");
+            printf(REDBOLD "    This value is unknown.\n");
             printf("    Please upload file and post under that issue:\n");
-            printf(YELBOLD"    https://github.com/xfwcfw/kelftool/issues/1\n"DEFCOL);
+            printf(YELBOLD "    https://github.com/xfwcfw/kelftool/issues/1\n" DEFCOL);
             break;
     }
-    printf(DEFCOL"header.Flags           = "YELLOW"%#X "DEFCOL, header.Flags);
+    printf(DEFCOL "header.Flags           = " YELLOW "%#X " DEFCOL, header.Flags);
     if (header.Flags == HDR_PREDEF_KELF)
-        printf(" - "GREENBOLD"kelf"DEFCOL":");
+        printf(" - " GREENBOLD "kelf" DEFCOL ":");
     else if (header.Flags == HDR_PREDEF_KIRX)
-        printf(" - "GREENBOLD"kirx"DEFCOL":");
+        printf(" - " GREENBOLD "kirx" DEFCOL ":");
     else
-        printf(" - "RED"unknown"DEFCOL":");
+        printf(" - " RED "unknown" DEFCOL ":");
     if (header.Flags & HDR_FLAG0_BLACKLIST)
-        printf(GREEN"HDR_FLAG0_BLACKLIST"DEFCOL"|");
+        printf(GREEN "HDR_FLAG0_BLACKLIST" DEFCOL "|");
     if (header.Flags & HDR_FLAG1_WHITELIST)
-        printf(GREEN"HDR_FLAG1_WHITELIST"DEFCOL"|");
+        printf(GREEN "HDR_FLAG1_WHITELIST" DEFCOL "|");
     if (header.Flags & HDR_FLAG2)
-        printf(GREEN"HDR_FLAG2"DEFCOL"|");
+        printf(GREEN "HDR_FLAG2" DEFCOL "|");
     if (header.Flags & HDR_FLAG3)
-        printf(GREEN"HDR_FLAG3"DEFCOL"|");
+        printf(GREEN "HDR_FLAG3" DEFCOL "|");
     if (header.Flags & HDR_FLAG4_1DES)
-        printf(GREEN"HDR_FLAG4_1DES"DEFCOL"|");
+        printf(GREEN "HDR_FLAG4_1DES" DEFCOL "|");
     if (header.Flags & HDR_FLAG4_3DES)
-        printf(GREEN"HDR_FLAG4_3DES"DEFCOL"|");
+        printf(GREEN "HDR_FLAG4_3DES" DEFCOL "|");
     if (header.Flags & HDR_FLAG6)
-        printf(GREEN"HDR_FLAG6"DEFCOL"|");
+        printf(GREEN "HDR_FLAG6" DEFCOL "|");
     if (header.Flags & HDR_FLAG7)
-        printf(GREEN"HDR_FLAG7"DEFCOL"|");
+        printf(GREEN "HDR_FLAG7" DEFCOL "|");
     if (header.Flags & HDR_FLAG8)
-        printf(GREEN"HDR_FLAG8"DEFCOL"|");
+        printf(GREEN "HDR_FLAG8" DEFCOL "|");
     if (header.Flags & HDR_FLAG9)
-        printf(GREEN"HDR_FLAG9"DEFCOL"|");
+        printf(GREEN "HDR_FLAG9" DEFCOL "|");
     if (header.Flags & HDR_FLAG10)
-        printf(GREEN"HDR_FLAG10"DEFCOL"|");
+        printf(GREEN "HDR_FLAG10" DEFCOL "|");
     if (header.Flags & HDR_FLAG11)
-        printf(GREEN"HDR_FLAG11"DEFCOL"|");
+        printf(GREEN "HDR_FLAG11" DEFCOL "|");
     if (header.Flags & HDR_FLAG12)
-        printf(GREEN"HDR_FLAG12"DEFCOL"|");
+        printf(GREEN "HDR_FLAG12" DEFCOL "|");
     if (header.Flags & HDR_FLAG13)
-        printf(GREEN"HDR_FLAG13"DEFCOL"|");
+        printf(GREEN "HDR_FLAG13" DEFCOL "|");
     if (header.Flags & HDR_FLAG14)
-        printf(GREEN"HDR_FLAG14"DEFCOL"|");
+        printf(GREEN "HDR_FLAG14" DEFCOL "|");
     if (header.Flags & HDR_FLAG15)
-        printf(GREEN"HDR_FLAG15"DEFCOL"|");
+        printf(GREEN "HDR_FLAG15" DEFCOL "|");
     printf("\n");
 
-    printf("header.BitCount        = "YELLOW"%#X \n"DEFCOL, header.BitCount);
-    printf("header.MGZones         = "YELLOW"%#X "DEFCOL" |", header.MGZones);
+    printf("header.BitCount        = " YELLOW "%#X \n" DEFCOL, header.BitCount);
+    printf("header.MGZones         = " YELLOW "%#X " DEFCOL " |", header.MGZones);
     if (header.MGZones == 0)
-        printf(REDBOLD"All regions blocked (useless)|"DEFCOL);
+        printf(REDBOLD "All regions blocked (useless)|" DEFCOL);
     else if (header.MGZones == REGION_ALL_ALLOWED)
-        printf(GREENBOLD"All regions allowed"DEFCOL"|");
+        printf(GREENBOLD "All regions allowed" DEFCOL "|");
     else {
         if (header.MGZones & REGION_JP)
-            printf(GREEN"Japan"DEFCOL"|");
+            printf(GREEN "Japan" DEFCOL "|");
         if (header.MGZones & REGION_NA)
-            printf(GREEN"North America"DEFCOL"|");
+            printf(GREEN "North America" DEFCOL "|");
         if (header.MGZones & REGION_EU)
-            printf(GREEN"Europe"DEFCOL"|");
+            printf(GREEN "Europe" DEFCOL "|");
         if (header.MGZones & REGION_AU)
-            printf(GREEN"Australia"DEFCOL"|");
+            printf(GREEN "Australia" DEFCOL "|");
         if (header.MGZones & REGION_ASIA)
-            printf(GREEN"Asia"DEFCOL"|");
+            printf(GREEN "Asia" DEFCOL "|");
         if (header.MGZones & REGION_RU)
-            printf(GREEN"Russia"DEFCOL"|");
+            printf(GREEN "Russia" DEFCOL "|");
         if (header.MGZones & REGION_CH)
-            printf(GREEN"China"DEFCOL"|");
+            printf(GREEN "China" DEFCOL "|");
         if (header.MGZones & REGION_MX)
-            printf(GREEN"Mexico"DEFCOL"|");
+            printf(GREEN "Mexico" DEFCOL "|");
     }
     printf("\n");
 
-    printf("header.gap             ="YELLOW);
+    printf("header.gap             =" YELLOW);
     for (unsigned int i = 0; i < 3; ++i)
         printf(" %02X", (unsigned char)header.gap[i]);
-    printf(DEFCOL"\n");
+    printf(DEFCOL "\n");
 
     std::string HeaderSignature;
     HeaderSignature.resize(8);
     fread(HeaderSignature.data(), 1, HeaderSignature.size(), f);
-    printf("HeaderSignature        ="YELLOW);
+    printf("HeaderSignature        =" YELLOW);
     for (size_t i = 0; i < 8; ++i)
         printf(" %02X", (unsigned char)HeaderSignature[i]);
     printf(DEFCOL);
@@ -254,11 +254,11 @@ int Kelf::LoadKelf(const std::string &filename)
     fread(Kc.data(), 1, Kc.size(), f);
     DecryptKeys(KEK);
 
-    printf("\nKbit                   ="YELLOW);
+    printf("\nKbit                   =" YELLOW);
     for (size_t i = 0; i < 16; ++i)
         printf(" %02X", (unsigned char)Kbit[i]);
 
-    printf(DEFCOL"\nKc                     ="YELLOW);
+    printf(DEFCOL "\nKc                     =" YELLOW);
     for (size_t i = 0; i < 16; ++i)
         printf(" %02X", (unsigned char)Kc[i]);
     printf(DEFCOL);
@@ -270,7 +270,7 @@ int Kelf::LoadKelf(const std::string &filename)
     }
 
     int BitTableSize = header.HeaderSize - ftell(f) - 8 - 8;
-    printf("\nBitTableSize           = "YELLOW"%#X\n"DEFCOL, BitTableSize);
+    printf("\nBitTableSize           = " YELLOW "%#X\n" DEFCOL, BitTableSize);
     if (BitTableSize > sizeof(BitTable)) {
         fclose(f);
         return KELF_ERROR_INVALID_BIT_TABLE_SIZE;
@@ -279,35 +279,35 @@ int Kelf::LoadKelf(const std::string &filename)
     fread(&bitTable, 1, BitTableSize, f);
 
     TdesCbcCfb64Decrypt((uint8_t *)&bitTable, (uint8_t *)&bitTable, BitTableSize, (uint8_t *)Kbit.data(), 2, ks.GetContentTableIV().data());
-    printf("bitTable.HeaderSize    = "YELLOW"%#X\n"DEFCOL, bitTable.HeaderSize);
-    printf("bitTable.BlockCount    = "YELLOW"%d\n"DEFCOL, bitTable.BlockCount);
-    printf("bitTable.gap           ="YELLOW);
+    printf("bitTable.HeaderSize    = " YELLOW "%#X\n" DEFCOL, bitTable.HeaderSize);
+    printf("bitTable.BlockCount    = " YELLOW "%d\n" DEFCOL, bitTable.BlockCount);
+    printf("bitTable.gap           =" YELLOW);
     for (unsigned int i = 0; i < 3; ++i)
         printf(" %02X", (unsigned char)bitTable.gap[i]);
-    printf(DEFCOL"\n                         Size        Signature           Flags\n");
+    printf(DEFCOL "\n                         Size        Signature           Flags\n");
     for (unsigned int i = 0; i < bitTable.BlockCount; ++i) {
-        printf(DEFCOL"    bitTable.Blocks[%d] = "YELLOW"%08X    ", (int)i, bitTable.Blocks[i].Size);
+        printf(DEFCOL "    bitTable.Blocks[%d] = " YELLOW "%08X    ", (int)i, bitTable.Blocks[i].Size);
         for (size_t j = 0; j < 8; ++j)
             printf("%02X", (unsigned char)bitTable.Blocks[i].Signature[j]);
-        printf("    %08X"DEFCOL, bitTable.Blocks[i].Flags);
+        printf("    %08X" DEFCOL, bitTable.Blocks[i].Flags);
         switch (bitTable.Blocks[i].Flags) {
             case 0:
-                printf(" ("GREEN"not encrypted, not signed"DEFCOL")\n");
+                printf(" (" GREEN "not encrypted, not signed" DEFCOL ")\n");
                 break;
             case 1:
-                printf(" ("GREEN"encrypted only"DEFCOL")\n");
+                printf(" (" GREEN "encrypted only" DEFCOL ")\n");
                 break;
             case 2:
-                printf(" ("GREEN"signed only"DEFCOL")\n");
+                printf(" (" GREEN "signed only" DEFCOL ")\n");
                 break;
             case 3:
-                printf(" ("GREEN"encrypted and signed"DEFCOL")\n");
+                printf(" (" GREEN "encrypted and signed" DEFCOL ")\n");
                 break;
             default:
                 printf(" (unknown set of flags)\n");
-                printf(REDBOLD"This value is unknown.\n");
+                printf(REDBOLD "This value is unknown.\n");
                 printf("Please upload file and post under that issue:\n");
-                printf(YELBOLD"https://github.com/xfwcfw/kelftool/issues/1\n"DEFCOL);
+                printf(YELBOLD "https://github.com/xfwcfw/kelftool/issues/1\n" DEFCOL);
                 break;
         }
     }
@@ -316,10 +316,10 @@ int Kelf::LoadKelf(const std::string &filename)
     std::string BitTableSignature;
     BitTableSignature.resize(8);
     fread(BitTableSignature.data(), 1, BitTableSignature.size(), f);
-    printf("BitTableSignature      ="YELLOW);
+    printf("BitTableSignature      =" YELLOW);
     for (size_t i = 0; i < 8; ++i)
         printf(" %02X", (unsigned char)BitTableSignature[i]);
-    printf(DEFCOL"\n");
+    printf(DEFCOL "\n");
 
     if (BitTableSignature != GetBitTableSignature()) {
         fclose(f);
@@ -330,10 +330,10 @@ int Kelf::LoadKelf(const std::string &filename)
     RootSignature.resize(8);
     fread(RootSignature.data(), 1, RootSignature.size(), f);
     if (RootSignature != GetRootSignature(HeaderSignature, BitTableSignature)) {
-        printf(YELBOLD"\nWARNING: RootSignature does not match         =");
+        printf(YELBOLD "\nWARNING: RootSignature does not match         =");
         for (size_t i = 0; i < 8; ++i)
             printf(" %02X", (unsigned char)RootSignature[i]);
-        printf(DEFCOL"\n");
+        printf(DEFCOL "\n");
 
         // fclose(f);
         // return KELF_ERROR_INVALID_ROOT_SIGNATURE;
@@ -348,7 +348,7 @@ int Kelf::LoadKelf(const std::string &filename)
     DecryptContent(header.Flags >> 4 & 3);
 
     if (VerifyContentSignature() != 0) {
-        printf(YELBOLD"WARNING: VerifyContentSignature does not match\n"DEFCOL);
+        printf(YELBOLD "WARNING: VerifyContentSignature does not match\n" DEFCOL);
         fclose(f);
         return KELF_ERROR_INVALID_CONTENT_SIGNATURE;
     }
@@ -393,7 +393,7 @@ int Kelf::SaveKelf(const std::string &filename, int headerid)
             break;
 
         default:
-            printf(YELLOW"WARNING: unknown header ID (%d) defaulting to FHDB ID\n"DEFCOL, headerid);
+            printf(YELLOW "WARNING: unknown header ID (%d) defaulting to FHDB ID\n" DEFCOL, headerid);
             USER_HEADER = USER_HEADER_FHDB;
             break;
     }
