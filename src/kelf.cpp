@@ -115,6 +115,8 @@ int Kelf::LoadKelf(const std::string &filename)
         printf(GREEN " (FHDB)\n" DEFCOL);
     else if (!memcmp(header.UserDefined, USER_HEADER_MBR, 16))
         printf(GREEN " (MBR)\n" DEFCOL);
+    else if (!memcmp(header.UserDefined, USER_HEADER_NAMCO_SECURITY_DONGLE_BOOTFILE, 16))
+        printf(GREEN " (System 246/256 Dongle BootFile)\n" DEFCOL);
     else
         printf(DEFCOL " (UNKNOWN)\n");
 
