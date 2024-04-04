@@ -132,6 +132,7 @@ int encrypt(int argc, char **argv)
             } else if (!strcmp(a, "KIRX")) {
                 GFlags = HDR_PREDEF_KIRX;
             } else if ((t = strtoul(a, NULL, 16)) <= std::numeric_limits<std::uint16_t>::max()) {
+                GFlags = (uint16_t)t;
                 if ((GFlags & HDR_FLAG4_1DES) && (GFlags & HDR_FLAG4_3DES)) {
                     printf(YELBOLD "WARNING: 0x%x specifies both Single and Triple DES. only one should be defined" DEFCOL "\n", t);
                 }
