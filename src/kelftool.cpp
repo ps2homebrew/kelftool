@@ -19,6 +19,7 @@
 #include <iostream>
 #include <limits>
 
+#include "common.h"
 #include "keystore.h"
 #include "kelf.h"
 
