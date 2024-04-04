@@ -121,7 +121,7 @@ int encrypt(int argc, char **argv)
                 GSystemtype = SYSTEM_TYPE_PS2;
             } else if (!strcmp(a, "PSX")) {
                 GSystemtype = SYSTEM_TYPE_PSX;
-            } else if ((t = strtoul(a, NULL, 10))<std::numeric_limits<std::uint8_t>::max()) {
+            } else if ((t = strtoul(a, NULL, 10)) <= std::numeric_limits<std::uint8_t>::max()) {
                 GSystemtype = (uint8_t)t;
             }
         } else if (!strncmp("--kflags=", argv[x], strlen("--kflags="))) {
@@ -131,8 +131,7 @@ int encrypt(int argc, char **argv)
                 GFlags = HDR_PREDEF_KELF;
             } else if (!strcmp(a, "KIRX")) {
                 GFlags = HDR_PREDEF_KIRX;
-            } else if ((t = strtoul(a, NULL, 16))<std::numeric_limits<std::uint16_t>::max()) {
-                GFlags = (uint8_t)t;
+            } else if ((t = strtoul(a, NULL, 16)) <= std::numeric_limits<std::uint16_t>::max()) {
                 if ((GFlags & HDR_FLAG4_1DES) && (GFlags & HDR_FLAG4_3DES)) {
                     printf(YELBOLD "WARNING: 0x%x specifies both Single and Triple DES. only one should be defined" DEFCOL "\n", t);
                 }
@@ -147,7 +146,7 @@ int encrypt(int argc, char **argv)
         } else if (!strncmp("--apptype=", argv[x], strlen("--apptype="))) {
             const char* a = &argv[x][10];
             long t;
-            if ((t = strtoul(a, NULL, 16))<std::numeric_limits<std::uint8_t>::max()) {
+            if ((t = strtoul(a, NULL, 16)) <= std::numeric_limits<std::uint8_t>::max()) {
                 GApplicationType = (uint8_t)t;
             }
         }
