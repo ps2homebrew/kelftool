@@ -16,6 +16,7 @@
  */
 #include <stdio.h>
 #include <string.h>
+#include <limits>
 
 #include "keystore.h"
 #include "kelf.h"
