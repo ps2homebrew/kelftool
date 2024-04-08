@@ -76,6 +76,8 @@ struct KELFHeader
 #define HDR_FLAG13          0x2000 // Unset. ??
 #define HDR_FLAG14          0x4000 // Unset. ??
 #define HDR_FLAG15          0x8000 // Unset. ??
+#define HDR_PREDEF_KELF 0x022c
+#define HDR_PREDEF_KIRX 0x021c
 
 // MGZones region flags. If unset - blocked in that region
 #define REGION_JP   0x1  // Japan
@@ -86,6 +88,13 @@ struct KELFHeader
 #define REGION_RU   0x20 // Russia
 #define REGION_CH   0x40 // China
 #define REGION_MX   0x80 // Mexico
+#define REGION_ALL_ALLOWED 0xFF
+
+#define KELFTYPE_DISC_WOOBLE 0
+#define KELFTYPE_XOSDMAIN 1
+#define KELFTYPE_DVDPLAYER_KIRX 5
+#define KELFTYPE_DVDPLAYER_KELF 7
+#define KELFTYPE_EARLY_MBR 11
 
 struct BitTable
 {
