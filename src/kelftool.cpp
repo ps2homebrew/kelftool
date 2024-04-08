@@ -20,6 +20,11 @@
 #include "keystore.h"
 #include "kelf.h"
 
+uint8_t GSystemtype = SYSTEM_TYPE_PS2;
+uint8_t GMGZones = REGION_ALL_ALLOWED;
+uint16_t GFlags = HDR_PREDEF_KELF;
+uint8_t GApplicationType = KELFTYPE_XOSDMAIN;
+
 // TODO: implement load/save kelf header configuration for byte-perfect encryption, decryption
 
 std::string getKeyStorePath()
@@ -89,6 +94,41 @@ int encrypt(int argc, char **argv)
         if (!strncmp("--keys=", argv[x], strlen("--keys="))) {
             printf("- Custom keyset %s\n", &argv[x][7]);
             KeyStoreEntry = &argv[x][7];
+        } else if (!strncmp("--systemtype=", argv[x], strlen("--systemtype="))) {
+            const char* a = &argv[x][13];
+            long t;
+            if (!strcmp(a, "PS2")) {
+                GSystemtype = SYSTEM_TYPE_PS2;
+            } else if (!strcmp(a, "PSX")) {
+                GSystemtype = SYSTEM_TYPE_PSX;
+            } else if ((t = strtoul(a, NULL, 10)) <= std::numeric_limits<std::uint8_t>::max()) {
+                GSystemtype = (uint8_t)t;
+            }
+        } else if (!strncmp("--kflags=", argv[x], strlen("--kflags="))) {
+            const char* a = &argv[x][9];
+            unsigned long t;
+            if (!strcmp(a, "KELF")) {
+                GFlags = HDR_PREDEF_KELF;
+            } else if (!strcmp(a, "KIRX")) {
+                GFlags = HDR_PREDEF_KIRX;
+            } else if ((t = strtoul(a, NULL, 16)) <= std::numeric_limits<std::uint16_t>::max()) {
+                GFlags = (uint16_t)t;
+                if ((GFlags & HDR_FLAG4_1DES) && (GFlags & HDR_FLAG4_3DES)) {
+                    printf("WARNING: 0x%x specifies both Single and Triple DES. only one should be defined\n", GFlags);
+                }
+            }
+        } else if (!strncmp("--mgzone=", argv[x], strlen("--mgzone="))) {
+            const char* a = &argv[x][9];
+            long t;
+            if ((t = strtoul(a, NULL, 16))<std::numeric_limits<std::uint8_t>::max()) {
+                GMGZones = (uint8_t)t;
+            }
+        } else if (!strncmp("--apptype=", argv[x], strlen("--apptype="))) {
+            const char* a = &argv[x][10];
+            long t;
+            if ((t = strtoul(a, NULL, 16)) <= std::numeric_limits<std::uint8_t>::max()) {
+                GApplicationType = (uint8_t)t;
+            }
         }
     }
 

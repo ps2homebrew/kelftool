@@ -84,6 +84,11 @@ void xor_bit(const void *a, const void *b, void *Result, size_t Length)
     }
 }
 
+extern uint8_t GSystemtype;
+extern uint8_t GMGZones;
+extern uint16_t GFlags;
+extern uint8_t GApplicationType;
+
 int Kelf::LoadKelf(const std::string &filename)
 {
     FILE *f = fopen(filename.c_str(), "rb");
@@ -390,11 +395,11 @@ int Kelf::SaveKelf(const std::string &filename, int headerid)
     memcpy(header.UserDefined, USER_HEADER, 16);
     header.ContentSize     = Content.size();      // sometimes zero
     header.HeaderSize      = bitTable.HeaderSize; // header + header signature + kbit + kc + bittable + bittable signature + root signature
-    header.SystemType      = SYSTEM_TYPE_PS2;     // same for COH (arcade)
-    header.ApplicationType = 1;                   // 1 = xosdmain, 5 = dvdplayer kirx 7 = dvdplayer kelf 0xB - ?? 0x00 - ??
+    header.SystemType      = GSystemtype;         // same for COH (arcade)
+    header.ApplicationType = GApplicationType;    // 1 = xosdmain, 5 = dvdplayer kirx 7 = dvdplayer kelf 0xB - ?? 0x00 - ??
     // TODO: implement and check 3DES/1DES difference based on header.Flags. In both - encryption and decryption.
-    header.Flags    = HDR_PREDEF_KELF; // ?? 00000010 00101100 binary, 0x021C for kirx
-    header.MGZones  = 0xFF;   // region bit, 1 - allowed
+    header.Flags    = GFlags;   // ?? 00000010 00101100 binary, 0x021C for kirx
+    header.MGZones  = GMGZones; // region bit, 1 - allowed
     header.BitCount = 0;
     // ?? balika, wisi: strange value, represents number of blacklisted iLinkID, ConsoleID
     // iLinkID (8 bytes), consoleID (8 bytes) placed between header.MGZones and HeaderSignature
