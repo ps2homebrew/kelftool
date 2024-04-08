@@ -108,6 +108,10 @@ int Kelf::LoadKelf(const std::string &filename)
         printf(" %02X", header.UserDefined[i]);
     if (!memcmp(header.UserDefined, USER_HEADER_FMCB, 16))
         printf(" (FMCB)\n");
+    if (!memcmp(header.UserDefined, USER_HEADER_DNASLOAD, 16))
+        printf(" (DNASLOAD)\n");
+    if (!memcmp(header.UserDefined, USER_HEADER_NAMCO_SECURITY_DONGLE_BOOTFILE, 16))
+        printf(" (System 2x6 Dongle BootFile)\n");
     else if (!memcmp(header.UserDefined, USER_HEADER_FHDB, 16))
         printf(" (FHDB)\n");
     else if (!memcmp(header.UserDefined, USER_HEADER_MBR, 16))
