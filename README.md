@@ -21,7 +21,7 @@ headerless elf creation:
 examples:
 
 	kelftool encrypt fhdb input.elf output.kelf
-    kelftool decrypot input.kelf output.elf
+    kelftool decrypt input.kelf output.elf
 
 *decrypt* command will also print useful information about kelf
 
