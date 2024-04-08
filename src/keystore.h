@@ -40,7 +40,7 @@ class KeyStore
     std::string ArcadeKc;
 
 public:
-    int Load(std::string filename);
+    int Load(std::string filename, std::string KeyStoreEntry);
 
     std::string GetSignatureMasterKey() { return SignatureMasterKey; }
     std::string GetSignatureHashKey() { return SignatureHashKey; }

@@ -33,16 +33,25 @@ std::string getKeyStorePath()
 
 int decrypt(int argc, char **argv)
 {
+    std::string KeyStoreEntry = "default";
+
     if (argc < 3) {
         printf("%s decrypt <input> <output>\n", argv[0]);
         return -1;
     }
 
+    for (int x = 3; x < argc; x++)
+    {
+        if (!strncmp("--keys=", argv[x], strlen("--keys="))) {
+            KeyStoreEntry = &argv[x][7];
+        }
+    }
+    
     KeyStore ks;
-    int ret = ks.Load(getKeyStorePath());
+    int ret = ks.Load("./PS2KEYS.dat", KeyStoreEntry);
     if (ret != 0) {
         // try to load keys from working directory
-        ret = ks.Load("./PS2KEYS.dat");
+        ret = ks.Load(getKeyStorePath(), KeyStoreEntry);
         if (ret != 0) {
             printf("Failed to load keystore: %d - %s\n", ret, KeyStore::getErrorString(ret).c_str());
             return ret;
@@ -66,13 +75,21 @@ int decrypt(int argc, char **argv)
 
 int encrypt(int argc, char **argv)
 {
-
+    std::string KeyStoreEntry = "default";
     int headerid = -1;
 
     if (argc < 4) {
         printf("%s encrypt <headerid> <input> <output>\n", argv[0]);
         printf("<headerid>: fmcb, fhdb, mbr\n");
         return -1;
+    }
+
+    for (int x = 4; x < argc; x++)
+    {
+        if (!strncmp("--keys=", argv[x], strlen("--keys="))) {
+            printf("- Custom keyset %s\n", &argv[x][7]);
+            KeyStoreEntry = &argv[x][7];
+        }
     }
 
     if (strcmp("fmcb", argv[1]) == 0)
@@ -91,10 +108,10 @@ int encrypt(int argc, char **argv)
     }
 
     KeyStore ks;
-    int ret = ks.Load(getKeyStorePath());
+    int ret = ks.Load("./PS2KEYS.dat", KeyStoreEntry);
     if (ret != 0) {
         // try to load keys from working directory
-        ret = ks.Load("./PS2KEYS.dat");
+        ret = ks.Load(getKeyStorePath(), KeyStoreEntry);
         if (ret != 0) {
             printf("Failed to load keystore: %d - %s\n", ret, KeyStore::getErrorString(ret).c_str());
             return ret;
