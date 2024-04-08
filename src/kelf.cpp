@@ -257,9 +257,9 @@ int Kelf::LoadKelf(const std::string &filename)
         printf(" %02X", (unsigned char)Kc[i]);
 
     // arcade
-    if (ks.GetArcadeKbit().size() && ks.GetArcadeKc().size()) {
-        memcpy(Kbit.data(), ks.GetArcadeKbit().data(), 16);
-        memcpy(Kc.data(), ks.GetArcadeKc().data(), 16);
+    if (ks.GetOverrideKbit().size() && ks.GetOverrideKc().size()) {
+        memcpy(Kbit.data(), ks.GetOverrideKbit().data(), 16);
+        memcpy(Kc.data(), ks.GetOverrideKc().data(), 16);
     }
 
     int BitTableSize = header.HeaderSize - ftell(f) - 8 - 8;
@@ -471,9 +471,9 @@ int Kelf::LoadContent(const std::string &filename, int headerid)
     std::fill(Kc.data(), Kc.data() + 16, 0x00);
 
     // arcade
-    if (ks.GetArcadeKbit().size() && ks.GetArcadeKc().size()) {
-        memcpy(Kbit.data(), ks.GetArcadeKbit().data(), 16);
-        memcpy(Kc.data(), ks.GetArcadeKc().data(), 16);
+    if (ks.GetOverrideKbit().size() && ks.GetOverrideKc().size()) {
+        memcpy(Kbit.data(), ks.GetOverrideKbit().data(), 16);
+        memcpy(Kc.data(), ks.GetOverrideKc().data(), 16);
     }
 
     std::fill(bitTable.gap, bitTable.gap + 3, 0);

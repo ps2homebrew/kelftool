@@ -76,8 +76,8 @@ int KeyStore::Load(std::string filename, std::string KeySet = "default")
     inipp::get_value(ini.sections[KeySet], "MG_ROOTSIG_HASH_KEY", RootSignatureHashKey);
     inipp::get_value(ini.sections[KeySet], "MG_CONTENT_TABLE_IV", ContentTableIV);
     inipp::get_value(ini.sections[KeySet], "MG_CONTENT_IV", ContentIV);
-    inipp::get_value(ini.sections[KeySet], "ARCADE_KBIT", ArcadeKbit);
-    inipp::get_value(ini.sections[KeySet], "ARCADE_KC", ArcadeKc);
+    inipp::get_value(ini.sections[KeySet], "OVERRIDE_KBIT", OverrideKbit);
+    inipp::get_value(ini.sections[KeySet], "OVERRIDE_KC", OverrideKc);
     SignatureMasterKey = hex2bin(SignatureMasterKey);
     SignatureHashKey = hex2bin(SignatureHashKey);
     KbitMasterKey = hex2bin(KbitMasterKey);
@@ -88,8 +88,8 @@ int KeyStore::Load(std::string filename, std::string KeySet = "default")
     RootSignatureHashKey = hex2bin(RootSignatureHashKey);
     ContentTableIV = hex2bin(ContentTableIV);
     ContentIV = hex2bin(ContentIV);
-    ArcadeKbit = hex2bin(ArcadeKbit);
-    ArcadeKc = hex2bin(ArcadeKc);
+    OverrideKbit = hex2bin(OverrideKbit);
+    OverrideKc = hex2bin(OverrideKc);
 
     if (SignatureMasterKey.size() == 0 || SignatureHashKey.size() == 0 ||
         KbitMasterKey.size() == 0 || KbitIV.size() == 0 ||

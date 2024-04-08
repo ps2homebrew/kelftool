@@ -23,6 +23,7 @@
 #define KEYSTORE_ERROR_LINE_NOT_KEY_VALUE -2
 #define KEYSTORE_ERROR_ODD_LEN_VALUE      -3
 #define KEYSTORE_ERROR_MISSING_KEY        -4
+#define KEYSTORE_SECTION_MISSING          -5
 
 class KeyStore
 {
@@ -36,8 +37,8 @@ class KeyStore
     std::string RootSignatureHashKey;
     std::string ContentTableIV;
     std::string ContentIV;
-    std::string ArcadeKbit;
-    std::string ArcadeKc;
+    std::string OverrideKbit;
+    std::string OverrideKc;
 
 public:
     int Load(std::string filename, std::string KeyStoreEntry);
@@ -52,8 +53,8 @@ public:
     std::string GetRootSignatureHashKey() { return RootSignatureHashKey; }
     std::string GetContentTableIV() { return ContentTableIV; }
     std::string GetContentIV() { return ContentIV; }
-    std::string GetArcadeKbit() { return ArcadeKbit; }
-    std::string GetArcadeKc() { return ArcadeKc; }
+    std::string GetOverrideKbit() { return OverrideKbit; }
+    std::string GetOverrideKc() { return OverrideKc; }
 
     static std::string getErrorString(int err);
 };

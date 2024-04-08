@@ -44,7 +44,7 @@ examples:
 
 #### Arcade
 
-Note: for arcade units (Namco System 246/256 and Konami Python 1) it is necessary to provide different keys and also additional keys: **ARCADE_KBIT** and **ARCADE_KC**
+Note: for arcade units (Namco System 246/256 and Konami Python 1) it is necessary to provide different keys and also additional keys: **OVERRIDE_KBIT** and **OVERRIDE_KC**
 
 #### Dev and proto
 
