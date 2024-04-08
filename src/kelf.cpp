@@ -366,16 +366,20 @@ int Kelf::SaveKelf(const std::string &filename, int headerid)
     static uint8_t *USER_HEADER;
 
     switch (headerid) {
-        case 0:
+        case HEADER::FMCB:
             USER_HEADER = USER_HEADER_FMCB;
             break;
 
-        case 1:
+        case HEADER::FHDB:
             USER_HEADER = USER_HEADER_FHDB;
             break;
 
-        case 2:
+        case HEADER::MBR:
             USER_HEADER = USER_HEADER_MBR;
+            break;
+
+        case HEADER::DNASLOAD:
+            USER_HEADER = USER_HEADER_DNASLOAD;
             break;
 
         default:
@@ -451,15 +455,19 @@ int Kelf::LoadContent(const std::string &filename, int headerid)
     // TODO: encrypted Kbit hold some useful data
     static uint8_t *USER_Kbit;
     switch (headerid) {
-        case 0:
+        case HEADER::FMCB:
+        case HEADER::DNASLOAD:
             USER_Kbit = USER_Kbit_FMCB;
             break;
-        case 1:
+
+        case HEADER::FHDB:
             USER_Kbit = USER_Kbit_FHDB;
             break;
-        case 2:
+
+        case HEADER::MBR:
             USER_Kbit = USER_Kbit_MBR;
             break;
+
         default:
             USER_Kbit = USER_Kbit_FHDB;
             break;

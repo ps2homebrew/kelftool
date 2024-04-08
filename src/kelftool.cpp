@@ -93,15 +93,18 @@ int encrypt(int argc, char **argv)
     }
 
     if (strcmp("fmcb", argv[1]) == 0)
-        headerid = 0;
+        headerid = HEADER::FMCB;
 
     if (strcmp("fhdb", argv[1]) == 0)
-        headerid = 1;
+        headerid = HEADER::FHDB;
 
     if (strcmp("mbr", argv[1]) == 0)
-        headerid = 2;
+        headerid = HEADER::MBR;
 
-    if (headerid == -1) {
+    if (strcmp("dnasload", argv[1]) == 0)
+        headerid = HEADER::DNASLOAD;
+
+    if (headerid == HEADER::INVALID) {
 
         printf("Invalid header: %s\n", argv[1]);
         return -1;
@@ -141,12 +144,13 @@ int main(int argc, char **argv)
         printf("Available submodules:\n");
         printf("\tdecrypt - decrypt and check signature of kelf files\n");
         printf("\tencrypt <headerid> - encrypt and sign kelf files <headerid>: fmcb, fhdb, mbr\n");
-        printf("\t\tfmcb - for retail PS2 memory cards\n");
-        printf("\t\tfhdb - for retail PS2 HDD (HDD OSD / BB Navigator)\n");
-        printf("\t\tmbr  - for retail PS2 HDD (mbr injection).\n");
-        printf("\t\t       Note: for mbr elf should load from 0x100000 and should be without headers:\n");
-        printf("\t\t       readelf -h <input_elf> should show 0x100000 or 0x100008\n");
-        printf("\t\t       $(EE_OBJCOPY) -O binary -v <input_elf> <headerless_elf>\n");
+        printf("\t\tfmcb     - for retail PS2 memory cards\n");
+        printf("\t\tdnasload - for retail PS2 memory cardsfor retail PS2 memory cards (PSX Whitelist)\n");
+        printf("\t\tfhdb     - for retail PS2 HDD (HDD OSD / BB Navigator)\n");
+        printf("\t\tmbr      - for retail PS2 HDD (mbr injection).\n");
+        printf("\t\t           Note: for mbr elf should load from 0x100000 and should be without headers:\n");
+        printf("\t\t           readelf -h <input_elf> should show 0x100000 or 0x100008\n");
+        printf("\t\t           $(EE_OBJCOPY) -O binary -v <input_elf> <headerless_elf>\n");
         return -1;
     }
 
