@@ -113,9 +113,9 @@ int Kelf::LoadKelf(const std::string &filename)
         printf(" %02X", header.UserDefined[i]);
     if (!memcmp(header.UserDefined, USER_HEADER_FMCB, 16))
         printf(" (FMCB)\n");
-    if (!memcmp(header.UserDefined, USER_HEADER_DNASLOAD, 16))
+    else if (!memcmp(header.UserDefined, USER_HEADER_DNASLOAD, 16))
         printf(" (DNASLOAD)\n");
-    if (!memcmp(header.UserDefined, USER_HEADER_NAMCO_SECURITY_DONGLE_BOOTFILE, 16))
+    else if (!memcmp(header.UserDefined, USER_HEADER_NAMCO_SECURITY_DONGLE_BOOTFILE, 16))
         printf(" (System 2x6 Dongle BootFile)\n");
     else if (!memcmp(header.UserDefined, USER_HEADER_FHDB, 16))
         printf(" (FHDB)\n");
@@ -257,7 +257,7 @@ int Kelf::LoadKelf(const std::string &filename)
     fread(Kc.data(), 1, Kc.size(), f);
     DecryptKeys(KEK);
 
-    printf("\nKbit                   =");
+    printf("Kbit                   =");
     for (size_t i = 0; i < 16; ++i)
         printf(" %02X", (unsigned char)Kbit[i]);
 
