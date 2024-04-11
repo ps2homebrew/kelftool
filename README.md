@@ -11,6 +11,7 @@ Place them in your home directory (%USERPROFILE%) in the "PS2KEYS.dat" file as a
     decrypt - decrypt and check the signature of kelf files
 	encrypt <headerid> - encrypt and sign kelf files <headerid>: fmcb, fhdb, mbr
 		fmcb - for retail PS2 memory cards
+		dnasload - for retail PS2 memory cards (PSX Whitelist)
 		fhdb - for retail PS2 HDD (HDD OSD / BB Navigator)
 		mbr  - for retail PS2 HDD (mbr injection).
 		       Note: for mbr, elf should load from 0x100000 and should be without headers:
@@ -21,7 +22,7 @@ headerless elf creation:
 examples:
 
 	kelftool encrypt fhdb input.elf output.kelf
-    kelftool decrypot input.kelf output.elf
+    kelftool decrypt input.kelf output.elf
 
 *decrypt* command will also print useful information about kelf
 
@@ -44,7 +45,7 @@ examples:
 
 #### Arcade
 
-Note: for arcade units (Namco System 246/256 and Konami Python 1) it is necessary to provide different keys and also additional keys: **ARCADE_KBIT** and **ARCADE_KC**
+Note: for arcade units (Namco System 246/256 and Konami Python 1) it is necessary to provide different keys and also additional keys: **OVERRIDE_KBIT** and **OVERRIDE_KC**
 
 #### Dev and proto
 

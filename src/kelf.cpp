@@ -84,6 +84,11 @@ void xor_bit(const void *a, const void *b, void *Result, size_t Length)
     }
 }
 
+extern uint8_t GSystemtype;
+extern uint8_t GMGZones;
+extern uint16_t GFlags;
+extern uint8_t GApplicationType;
+
 int Kelf::LoadKelf(const std::string &filename)
 {
     FILE *f = fopen(filename.c_str(), "rb");
@@ -108,6 +113,10 @@ int Kelf::LoadKelf(const std::string &filename)
         printf(" %02X", header.UserDefined[i]);
     if (!memcmp(header.UserDefined, USER_HEADER_FMCB, 16))
         printf(" (FMCB)\n");
+    else if (!memcmp(header.UserDefined, USER_HEADER_DNASLOAD, 16))
+        printf(" (DNASLOAD)\n");
+    else if (!memcmp(header.UserDefined, USER_HEADER_NAMCO_SECURITY_DONGLE_BOOTFILE, 16))
+        printf(" (System 2x6 Dongle BootFile)\n");
     else if (!memcmp(header.UserDefined, USER_HEADER_FHDB, 16))
         printf(" (FHDB)\n");
     else if (!memcmp(header.UserDefined, USER_HEADER_MBR, 16))
@@ -132,19 +141,19 @@ int Kelf::LoadKelf(const std::string &filename)
             break;
     }
     switch (header.ApplicationType) {
-        case 0:
+        case KELFTYPE_DISC_WOOBLE:
             printf("header.ApplicationType = 0 (disc wobble \?)\n");
             break;
-        case 1:
+        case KELFTYPE_XOSDMAIN:
             printf("header.ApplicationType = 1 (xosdmain)\n");
             break;
-        case 5:
+        case KELFTYPE_DVDPLAYER_KIRX:
             printf("header.ApplicationType = 5 (dvdplayer kirx)\n");
             break;
-        case 7:
+        case KELFTYPE_DVDPLAYER_KELF:
             printf("header.ApplicationType = 7 (dvdplayer kelf)\n");
             break;
-        case 11:
+        case KELFTYPE_EARLY_MBR:
             printf("header.ApplicationType = 11 (early mbr \?)\n");
             break;
         default:
@@ -155,9 +164,9 @@ int Kelf::LoadKelf(const std::string &filename)
             break;
     }
     printf("header.Flags           = %#X", header.Flags);
-    if (header.Flags == 0x022c)
+    if (header.Flags == HDR_PREDEF_KELF)
         printf(" - kelf:");
-    else if (header.Flags == 0x021c)
+    else if (header.Flags == HDR_PREDEF_KIRX)
         printf(" - kirx:");
     else
         printf(" - unknown:");
@@ -199,7 +208,7 @@ int Kelf::LoadKelf(const std::string &filename)
     printf("header.MGZones         = %#X |", header.MGZones);
     if (header.MGZones == 0)
         printf("All regions blocked (useless)|");
-    else if (header.MGZones == 0xFF)
+    else if (header.MGZones == REGION_ALL_ALLOWED )
         printf("All regions allowed|");
     else {
         if (header.MGZones & REGION_JP)
@@ -248,7 +257,7 @@ int Kelf::LoadKelf(const std::string &filename)
     fread(Kc.data(), 1, Kc.size(), f);
     DecryptKeys(KEK);
 
-    printf("\nKbit                   =");
+    printf("Kbit                   =");
     for (size_t i = 0; i < 16; ++i)
         printf(" %02X", (unsigned char)Kbit[i]);
 
@@ -257,9 +266,9 @@ int Kelf::LoadKelf(const std::string &filename)
         printf(" %02X", (unsigned char)Kc[i]);
 
     // arcade
-    if (ks.GetArcadeKbit().size() && ks.GetArcadeKc().size()) {
-        memcpy(Kbit.data(), ks.GetArcadeKbit().data(), 16);
-        memcpy(Kc.data(), ks.GetArcadeKc().data(), 16);
+    if (ks.GetOverrideKbit().size() && ks.GetOverrideKc().size()) {
+        memcpy(Kbit.data(), ks.GetOverrideKbit().data(), 16);
+        memcpy(Kc.data(), ks.GetOverrideKc().data(), 16);
     }
 
     int BitTableSize = header.HeaderSize - ftell(f) - 8 - 8;
@@ -362,16 +371,20 @@ int Kelf::SaveKelf(const std::string &filename, int headerid)
     static uint8_t *USER_HEADER;
 
     switch (headerid) {
-        case 0:
+        case HEADER::FMCB:
             USER_HEADER = USER_HEADER_FMCB;
             break;
 
-        case 1:
+        case HEADER::FHDB:
             USER_HEADER = USER_HEADER_FHDB;
             break;
 
-        case 2:
+        case HEADER::MBR:
             USER_HEADER = USER_HEADER_MBR;
+            break;
+
+        case HEADER::DNASLOAD:
+            USER_HEADER = USER_HEADER_DNASLOAD;
             break;
 
         default:
@@ -382,11 +395,11 @@ int Kelf::SaveKelf(const std::string &filename, int headerid)
     memcpy(header.UserDefined, USER_HEADER, 16);
     header.ContentSize     = Content.size();      // sometimes zero
     header.HeaderSize      = bitTable.HeaderSize; // header + header signature + kbit + kc + bittable + bittable signature + root signature
-    header.SystemType      = SYSTEM_TYPE_PS2;     // same for COH (arcade)
-    header.ApplicationType = 1;                   // 1 = xosdmain, 5 = dvdplayer kirx 7 = dvdplayer kelf 0xB - ?? 0x00 - ??
+    header.SystemType      = GSystemtype;         // same for COH (arcade)
+    header.ApplicationType = GApplicationType;    // 1 = xosdmain, 5 = dvdplayer kirx 7 = dvdplayer kelf 0xB - ?? 0x00 - ??
     // TODO: implement and check 3DES/1DES difference based on header.Flags. In both - encryption and decryption.
-    header.Flags    = 0x022C; // ?? 00000010 00101100 binary, 0x021C for kirx
-    header.MGZones  = 0xFF;   // region bit, 1 - allowed
+    header.Flags    = GFlags;   // ?? 00000010 00101100 binary, 0x021C for kirx
+    header.MGZones  = GMGZones; // region bit, 1 - allowed
     header.BitCount = 0;
     // ?? balika, wisi: strange value, represents number of blacklisted iLinkID, ConsoleID
     // iLinkID (8 bytes), consoleID (8 bytes) placed between header.MGZones and HeaderSignature
@@ -447,15 +460,19 @@ int Kelf::LoadContent(const std::string &filename, int headerid)
     // TODO: encrypted Kbit hold some useful data
     static uint8_t *USER_Kbit;
     switch (headerid) {
-        case 0:
+        case HEADER::FMCB:
+        case HEADER::DNASLOAD:
             USER_Kbit = USER_Kbit_FMCB;
             break;
-        case 1:
+
+        case HEADER::FHDB:
             USER_Kbit = USER_Kbit_FHDB;
             break;
-        case 2:
+
+        case HEADER::MBR:
             USER_Kbit = USER_Kbit_MBR;
             break;
+
         default:
             USER_Kbit = USER_Kbit_FHDB;
             break;
@@ -471,9 +488,9 @@ int Kelf::LoadContent(const std::string &filename, int headerid)
     std::fill(Kc.data(), Kc.data() + 16, 0x00);
 
     // arcade
-    if (ks.GetArcadeKbit().size() && ks.GetArcadeKc().size()) {
-        memcpy(Kbit.data(), ks.GetArcadeKbit().data(), 16);
-        memcpy(Kc.data(), ks.GetArcadeKc().data(), 16);
+    if (ks.GetOverrideKbit().size() && ks.GetOverrideKc().size()) {
+        memcpy(Kbit.data(), ks.GetOverrideKbit().data(), 16);
+        memcpy(Kc.data(), ks.GetOverrideKc().data(), 16);
     }
 
     std::fill(bitTable.gap, bitTable.gap + 3, 0);

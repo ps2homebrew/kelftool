@@ -16,9 +16,15 @@
  */
 #include <stdio.h>
 #include <string.h>
+#include <limits>
 
 #include "keystore.h"
 #include "kelf.h"
+
+uint8_t GSystemtype = SYSTEM_TYPE_PS2;
+uint8_t GMGZones = REGION_ALL_ALLOWED;
+uint16_t GFlags = HDR_PREDEF_KELF;
+uint8_t GApplicationType = KELFTYPE_XOSDMAIN;
 
 // TODO: implement load/save kelf header configuration for byte-perfect encryption, decryption
 
@@ -33,16 +39,25 @@ std::string getKeyStorePath()
 
 int decrypt(int argc, char **argv)
 {
+    std::string KeyStoreEntry = "default";
+
     if (argc < 3) {
         printf("%s decrypt <input> <output>\n", argv[0]);
         return -1;
     }
 
+    for (int x = 3; x < argc; x++)
+    {
+        if (!strncmp("--keys=", argv[x], strlen("--keys="))) {
+            KeyStoreEntry = &argv[x][7];
+        }
+    }
+    
     KeyStore ks;
-    int ret = ks.Load(getKeyStorePath());
+    int ret = ks.Load("./PS2KEYS.dat", KeyStoreEntry);
     if (ret != 0) {
         // try to load keys from working directory
-        ret = ks.Load("./PS2KEYS.dat");
+        ret = ks.Load(getKeyStorePath(), KeyStoreEntry);
         if (ret != 0) {
             printf("Failed to load keystore: %d - %s\n", ret, KeyStore::getErrorString(ret).c_str());
             return ret;
@@ -66,7 +81,7 @@ int decrypt(int argc, char **argv)
 
 int encrypt(int argc, char **argv)
 {
-
+    std::string KeyStoreEntry = "default";
     int headerid = -1;
 
     if (argc < 4) {
@@ -75,26 +90,72 @@ int encrypt(int argc, char **argv)
         return -1;
     }
 
+    for (int x = 4; x < argc; x++)
+    {
+        if (!strncmp("--keys=", argv[x], strlen("--keys="))) {
+            printf("- Custom keyset %s\n", &argv[x][7]);
+            KeyStoreEntry = &argv[x][7];
+        } else if (!strncmp("--systemtype=", argv[x], strlen("--systemtype="))) {
+            const char* a = &argv[x][13];
+            long t;
+            if (!strcmp(a, "PS2")) {
+                GSystemtype = SYSTEM_TYPE_PS2;
+            } else if (!strcmp(a, "PSX")) {
+                GSystemtype = SYSTEM_TYPE_PSX;
+            } else if ((t = strtoul(a, NULL, 10)) <= std::numeric_limits<std::uint8_t>::max()) {
+                GSystemtype = (uint8_t)t;
+            }
+        } else if (!strncmp("--kflags=", argv[x], strlen("--kflags="))) {
+            const char* a = &argv[x][9];
+            unsigned long t;
+            if (!strcmp(a, "KELF")) {
+                GFlags = HDR_PREDEF_KELF;
+            } else if (!strcmp(a, "KIRX")) {
+                GFlags = HDR_PREDEF_KIRX;
+            } else if ((t = strtoul(a, NULL, 16)) <= std::numeric_limits<std::uint16_t>::max()) {
+                GFlags = (uint16_t)t;
+                if ((GFlags & HDR_FLAG4_1DES) && (GFlags & HDR_FLAG4_3DES)) {
+                    printf("WARNING: 0x%x specifies both Single and Triple DES. only one should be defined\n", GFlags);
+                }
+            }
+        } else if (!strncmp("--mgzone=", argv[x], strlen("--mgzone="))) {
+            const char* a = &argv[x][9];
+            long t;
+            if ((t = strtoul(a, NULL, 16))<std::numeric_limits<std::uint8_t>::max()) {
+                GMGZones = (uint8_t)t;
+            }
+        } else if (!strncmp("--apptype=", argv[x], strlen("--apptype="))) {
+            const char* a = &argv[x][10];
+            long t;
+            if ((t = strtoul(a, NULL, 16)) <= std::numeric_limits<std::uint8_t>::max()) {
+                GApplicationType = (uint8_t)t;
+            }
+        }
+    }
+
     if (strcmp("fmcb", argv[1]) == 0)
-        headerid = 0;
+        headerid = HEADER::FMCB;
 
     if (strcmp("fhdb", argv[1]) == 0)
-        headerid = 1;
+        headerid = HEADER::FHDB;
 
     if (strcmp("mbr", argv[1]) == 0)
-        headerid = 2;
+        headerid = HEADER::MBR;
 
-    if (headerid == -1) {
+    if (strcmp("dnasload", argv[1]) == 0)
+        headerid = HEADER::DNASLOAD;
+
+    if (headerid == HEADER::INVALID) {
 
         printf("Invalid header: %s\n", argv[1]);
         return -1;
     }
 
     KeyStore ks;
-    int ret = ks.Load(getKeyStorePath());
+    int ret = ks.Load("./PS2KEYS.dat", KeyStoreEntry);
     if (ret != 0) {
         // try to load keys from working directory
-        ret = ks.Load("./PS2KEYS.dat");
+        ret = ks.Load(getKeyStorePath(), KeyStoreEntry);
         if (ret != 0) {
             printf("Failed to load keystore: %d - %s\n", ret, KeyStore::getErrorString(ret).c_str());
             return ret;
@@ -124,12 +185,13 @@ int main(int argc, char **argv)
         printf("Available submodules:\n");
         printf("\tdecrypt - decrypt and check signature of kelf files\n");
         printf("\tencrypt <headerid> - encrypt and sign kelf files <headerid>: fmcb, fhdb, mbr\n");
-        printf("\t\tfmcb - for retail PS2 memory cards\n");
-        printf("\t\tfhdb - for retail PS2 HDD (HDD OSD / BB Navigator)\n");
-        printf("\t\tmbr  - for retail PS2 HDD (mbr injection).\n");
-        printf("\t\t       Note: for mbr elf should load from 0x100000 and should be without headers:\n");
-        printf("\t\t       readelf -h <input_elf> should show 0x100000 or 0x100008\n");
-        printf("\t\t       $(EE_OBJCOPY) -O binary -v <input_elf> <headerless_elf>\n");
+        printf("\t\tfmcb     - for retail PS2 memory cards\n");
+        printf("\t\tdnasload - for retail PS2 memory cardsfor retail PS2 memory cards (PSX Whitelist)\n");
+        printf("\t\tfhdb     - for retail PS2 HDD (HDD OSD / BB Navigator)\n");
+        printf("\t\tmbr      - for retail PS2 HDD (mbr injection).\n");
+        printf("\t\t           Note: for mbr elf should load from 0x100000 and should be without headers:\n");
+        printf("\t\t           readelf -h <input_elf> should show 0x100000 or 0x100008\n");
+        printf("\t\t           $(EE_OBJCOPY) -O binary -v <input_elf> <headerless_elf>\n");
         return -1;
     }
 
