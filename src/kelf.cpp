@@ -387,6 +387,10 @@ int Kelf::SaveKelf(const std::string &filename, int headerid)
             USER_HEADER = USER_HEADER_DNASLOAD;
             break;
 
+        case HEADER::ARCADE_BOOTFILE:
+            USER_HEADER = USER_HEADER_NAMCO_SECURITY_DONGLE_BOOTFILE;
+            break;
+
         default:
             USER_HEADER = USER_HEADER_FHDB;
             break;
