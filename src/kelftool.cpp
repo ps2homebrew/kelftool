@@ -197,7 +197,7 @@ int main(int argc, char **argv)
         printf("\tdecrypt - decrypt and check signature of kelf files\n");
         printf("\tencrypt <headerid> - encrypt and sign kelf files <headerid>: fmcb, fhdb, mbr, dnasload, dongle\n");
         printf("\t\tfmcb     - for retail PS2 memory cards\n");
-        printf("\t\tdnasload - for retail PS2 memory cardsfor retail PS2 memory cards (PSX Whitelist)\n");
+        printf("\t\tdnasload - for retail PS2 memory cardsfor retail PS2 memory cards (PSX bypass)\n");
         printf("\t\tdongle   - for arcade PS2 Security Dongle\n");
         printf("\t\tfhdb     - for retail PS2 HDD (HDD OSD / BB Navigator)\n");
         printf("\t\tmbr      - for retail PS2 HDD (mbr injection).\n");
