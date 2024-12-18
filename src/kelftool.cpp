@@ -42,7 +42,9 @@ int decrypt(int argc, char **argv)
     std::string KeyStoreEntry = "default";
 
     if (argc < 3) {
-        printf("%s decrypt <input> <output>\n", argv[0]);
+        printf("%s decrypt <input> <output> [Flags]\n", argv[0]);
+        printf("\tFlags:\n");
+        printf("\t\t--keys        Specify keys to be used\n");
         return -1;
     }
 
@@ -85,8 +87,14 @@ int encrypt(int argc, char **argv)
     int headerid = -1;
 
     if (argc < 4) {
-        printf("%s encrypt <headerid> <input> <output>\n", argv[0]);
-        printf("<headerid>: fmcb, fhdb, mbr\n");
+        printf("%s encrypt <headerid> <input> <output> [Flags]\n", argv[0]);
+        printf("<headerid>: fmcb, fhdb, mbr dnasload dongle\n");
+        printf("\tFlags:\n");
+        printf("\t\t--keys        Specify keys to be used\n");
+        printf("\t\t--mgzone      Specify custom region whitelist\n");
+        printf("\t\t--apptype     Specify application type \n");
+        printf("\t\t--kflags      Specify custom flags for KELF Header\n");
+        printf("\t\t--systemtype  Specify sys type (PS2 or PSX)\n");
         return -1;
     }
 
@@ -145,6 +153,9 @@ int encrypt(int argc, char **argv)
     if (strcmp("dnasload", argv[1]) == 0)
         headerid = HEADER::DNASLOAD;
 
+    if (strcmp("dongle", argv[1]) == 0)
+        headerid = HEADER::ARCADE_BOOTFILE;
+
     if (headerid == HEADER::INVALID) {
 
         printf("Invalid header: %s\n", argv[1]);
@@ -184,9 +195,10 @@ int main(int argc, char **argv)
         printf("usage: %s <submodule> <args>\n", argv[0]);
         printf("Available submodules:\n");
         printf("\tdecrypt - decrypt and check signature of kelf files\n");
-        printf("\tencrypt <headerid> - encrypt and sign kelf files <headerid>: fmcb, fhdb, mbr\n");
+        printf("\tencrypt <headerid> - encrypt and sign kelf files <headerid>: fmcb, fhdb, mbr, dnasload, dongle\n");
         printf("\t\tfmcb     - for retail PS2 memory cards\n");
-        printf("\t\tdnasload - for retail PS2 memory cards (PSX bypass)\n");
+        printf("\t\tdnasload - for retail PS2 memory cardsfor retail PS2 memory cards (PSX bypass)\n");
+        printf("\t\tdongle   - for arcade PS2 Security Dongle\n");
         printf("\t\tfhdb     - for retail PS2 HDD (HDD OSD / BB Navigator)\n");
         printf("\t\tmbr      - for retail PS2 HDD (mbr injection).\n");
         printf("\t\t           Note: for mbr elf should load from 0x100000 and should be without headers:\n");
