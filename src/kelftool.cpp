@@ -87,12 +87,12 @@ int encrypt(int argc, char **argv)
 
     if (argc < 4) {
         printf("%s encrypt <headerid> <input> <output> [Flags]\n", argv[0]);
-        printf("<headerid>: fmcb, fhdb, mbr dnasload dongle\n");
+        printf("<headerid>: fmcb, fhdb, mbr, dnasload, dongle\n");
         printf("\tFlags:\n");
-        printf("\t\t--keys        Specify keys to be used\n");
-        printf("\t\t--mgzone      Specify custom region whitelist\n");
-        printf("\t\t--apptype     Specify application type \n");
-        printf("\t\t--kflags      Specify custom flags for KELF Header\n");
+        printf("\t\t--keys        Specify keys to be used from PS2KEYS.dat (default, retail, dev, arcade, prototype)\n");
+        printf("\t\t--mgzone      Specify custom region whitelist (default 0xFF: all allowed), example: --mgzone=0x03 (Japan+North America)\n");
+        printf("\t\t--apptype     Specify application type (default 1: XOSDMAIN), example --apptype=7\n");
+        printf("\t\t--kflags      Specify custom flags for KELF Header, default: --kflags=KELF\n");
         printf("\t\t--systemtype  Specify sys type (PS2 or PSX)\n");
         return -1;
     }

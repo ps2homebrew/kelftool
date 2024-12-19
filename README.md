@@ -8,14 +8,24 @@ Place them in your home directory (%USERPROFILE%) in the "PS2KEYS.dat" file as a
 
 ## Usage
 
-    decrypt - decrypt and check the signature of kelf files
+    %s <main command> <headerid> <input> <output> [Flags]
+	decrypt - decrypt and check the signature of kelf files
 	encrypt <headerid> - encrypt and sign kelf files <headerid>: fmcb, fhdb, mbr
 		fmcb - for retail PS2 memory cards
 		dnasload - for retail PS2 memory cards (PSX Whitelist)
 		fhdb - for retail PS2 HDD (HDD OSD / BB Navigator)
+		dongle - for namco System 246/256 and Konami Python 1
 		mbr  - for retail PS2 HDD (mbr injection).
 		       Note: for mbr, elf should load from 0x100000 and should be without headers:
 		       readelf -h <input_elf> should show 0x100000 or 0x100008
+	Flags:
+		--keys        Specify keys to be used from PS2KEYS.dat (default, retail, dev, arcade, prototype)
+		--mgzone      Specify custom region whitelist (default 0xFF: all allowed), example: --mgzone=0x03 (Japan+North America)
+		--apptype     Specify application type (default 1: XOSDMAIN), example --apptype=7
+		--kflags      Specify custom flags for KELF Header, default: --kflags=KELF
+		--systemtype  Specify sys type (PS2 or PSX)
+
+
 headerless elf creation:
 
       $(EE_OBJCOPY) -O binary -v <input_elf> <headerless_elf>
@@ -23,6 +33,7 @@ examples:
 
 	kelftool encrypt fhdb input.elf output.kelf
     kelftool decrypt input.kelf output.elf
+	kelftool encrypt dongle boot.elf boot.bin --keys=arcade --apptype=7
 
 *decrypt* command will also print useful information about kelf
 
