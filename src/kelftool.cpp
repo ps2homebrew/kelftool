@@ -21,9 +21,9 @@
 #include "keystore.h"
 #include "kelf.h"
 
-uint8_t GSystemtype = SYSTEM_TYPE_PS2;
-uint8_t GMGZones = REGION_ALL_ALLOWED;
-uint16_t GFlags = HDR_PREDEF_KELF;
+uint8_t GSystemtype      = SYSTEM_TYPE_PS2;
+uint8_t GMGZones         = REGION_ALL_ALLOWED;
+uint16_t GFlags          = HDR_PREDEF_KELF;
 uint8_t GApplicationType = KELFTYPE_XOSDMAIN;
 
 // TODO: implement load/save kelf header configuration for byte-perfect encryption, decryption
@@ -48,13 +48,12 @@ int decrypt(int argc, char **argv)
         return -1;
     }
 
-    for (int x = 3; x < argc; x++)
-    {
+    for (int x = 3; x < argc; x++) {
         if (!strncmp("--keys=", argv[x], strlen("--keys="))) {
             KeyStoreEntry = &argv[x][7];
         }
     }
-    
+
     KeyStore ks;
     int ret = ks.Load("./PS2KEYS.dat", KeyStoreEntry);
     if (ret != 0) {
@@ -84,7 +83,7 @@ int decrypt(int argc, char **argv)
 int encrypt(int argc, char **argv)
 {
     std::string KeyStoreEntry = "default";
-    int headerid = -1;
+    int headerid              = -1;
 
     if (argc < 4) {
         printf("%s encrypt <headerid> <input> <output> [Flags]\n", argv[0]);
@@ -98,13 +97,12 @@ int encrypt(int argc, char **argv)
         return -1;
     }
 
-    for (int x = 4; x < argc; x++)
-    {
+    for (int x = 4; x < argc; x++) {
         if (!strncmp("--keys=", argv[x], strlen("--keys="))) {
             printf("- Custom keyset %s\n", &argv[x][7]);
             KeyStoreEntry = &argv[x][7];
         } else if (!strncmp("--systemtype=", argv[x], strlen("--systemtype="))) {
-            const char* a = &argv[x][13];
+            const char *a = &argv[x][13];
             long t;
             if (!strcmp(a, "PS2")) {
                 GSystemtype = SYSTEM_TYPE_PS2;
@@ -114,7 +112,7 @@ int encrypt(int argc, char **argv)
                 GSystemtype = (uint8_t)t;
             }
         } else if (!strncmp("--kflags=", argv[x], strlen("--kflags="))) {
-            const char* a = &argv[x][9];
+            const char *a = &argv[x][9];
             unsigned long t;
             if (!strcmp(a, "KELF")) {
                 GFlags = HDR_PREDEF_KELF;
@@ -127,13 +125,13 @@ int encrypt(int argc, char **argv)
                 }
             }
         } else if (!strncmp("--mgzone=", argv[x], strlen("--mgzone="))) {
-            const char* a = &argv[x][9];
+            const char *a = &argv[x][9];
             long t;
-            if ((t = strtoul(a, NULL, 16))<std::numeric_limits<std::uint8_t>::max()) {
+            if ((t = strtoul(a, NULL, 16)) < std::numeric_limits<std::uint8_t>::max()) {
                 GMGZones = (uint8_t)t;
             }
         } else if (!strncmp("--apptype=", argv[x], strlen("--apptype="))) {
-            const char* a = &argv[x][10];
+            const char *a = &argv[x][10];
             long t;
             if ((t = strtoul(a, NULL, 16)) <= std::numeric_limits<std::uint8_t>::max()) {
                 GApplicationType = (uint8_t)t;

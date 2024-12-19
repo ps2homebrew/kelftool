@@ -21,7 +21,7 @@ jobs:
       - name: Build
         run: msbuild /p:Configuration=Release
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: kelftool-windows
           path: Release/kelftool.exe
@@ -34,14 +34,12 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - run: brew install openssl
-
       - name: Build
         run: |
           make
           tar -zcvf kelftool-macos.tar.gz build/kelftool
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: kelftool-macos
           path: kelftool-macos.tar.gz
@@ -61,7 +59,7 @@ jobs:
           make
           tar -zcvf kelftool-linux.tar.gz build/kelftool
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: kelftool-linux
           path: kelftool-linux.tar.gz
@@ -76,21 +74,21 @@ jobs:
       - name: Get short SHA and repository name
         id: slug
         run: |
-          echo "::set-output name=sha8::$(echo ${GITHUB_SHA} | cut -c1-8)"
-          echo "::set-output name=REPOSITORY_NAME::$(echo "$GITHUB_REPOSITORY" | awk -F / '{print $2}' | sed -e "s/:refs//")"
+          echo "sha8=$(echo ${GITHUB_SHA} | cut -c1-8)" >> $GITHUB_ENV
+          echo "REPOSITORY_NAME=$(echo "$GITHUB_REPOSITORY" | awk -F / '{print $2}' | sed -e "s/:refs//")" >> $GITHUB_ENV
 
       - name: Download kelftool-windows artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: kelftool-windows
 
       - name: Download kelftool-macos artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: kelftool-macos
 
       - name: Download kelftool-linux artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: kelftool-linux
 

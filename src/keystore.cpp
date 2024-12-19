@@ -59,10 +59,10 @@ int KeyStore::Load(std::string filename, std::string KeySet = "default")
     std::ifstream infile(filename);
     if (infile.fail())
         return KEYSTORE_ERROR_OPEN_FAILED;
-	ini.parse(infile);
-	ini.strip_trailing_comments();
-	ini.default_section(ini.sections["default"]);
-	ini.interpolate();
+    ini.parse(infile);
+    ini.strip_trailing_comments();
+    ini.default_section(ini.sections["default"]);
+    ini.interpolate();
     if (ini.sections.find(KeySet) == ini.sections.end()) {
         return KEYSTORE_SECTION_MISSING;
     }
@@ -78,18 +78,18 @@ int KeyStore::Load(std::string filename, std::string KeySet = "default")
     inipp::get_value(ini.sections[KeySet], "MG_CONTENT_IV", ContentIV);
     inipp::get_value(ini.sections[KeySet], "OVERRIDE_KBIT", OverrideKbit);
     inipp::get_value(ini.sections[KeySet], "OVERRIDE_KC", OverrideKc);
-    SignatureMasterKey = hex2bin(SignatureMasterKey);
-    SignatureHashKey = hex2bin(SignatureHashKey);
-    KbitMasterKey = hex2bin(KbitMasterKey);
-    KbitIV = hex2bin(KbitIV);
-    KcMasterKey = hex2bin(KcMasterKey);
-    KcIV = hex2bin(KcIV);
+    SignatureMasterKey     = hex2bin(SignatureMasterKey);
+    SignatureHashKey       = hex2bin(SignatureHashKey);
+    KbitMasterKey          = hex2bin(KbitMasterKey);
+    KbitIV                 = hex2bin(KbitIV);
+    KcMasterKey            = hex2bin(KcMasterKey);
+    KcIV                   = hex2bin(KcIV);
     RootSignatureMasterKey = hex2bin(RootSignatureMasterKey);
-    RootSignatureHashKey = hex2bin(RootSignatureHashKey);
-    ContentTableIV = hex2bin(ContentTableIV);
-    ContentIV = hex2bin(ContentIV);
-    OverrideKbit = hex2bin(OverrideKbit);
-    OverrideKc = hex2bin(OverrideKc);
+    RootSignatureHashKey   = hex2bin(RootSignatureHashKey);
+    ContentTableIV         = hex2bin(ContentTableIV);
+    ContentIV              = hex2bin(ContentIV);
+    OverrideKbit           = hex2bin(OverrideKbit);
+    OverrideKc             = hex2bin(OverrideKc);
 
     if (SignatureMasterKey.size() == 0 || SignatureHashKey.size() == 0 ||
         KbitMasterKey.size() == 0 || KbitIV.size() == 0 ||

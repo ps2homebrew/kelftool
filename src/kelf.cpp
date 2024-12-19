@@ -208,7 +208,7 @@ int Kelf::LoadKelf(const std::string &filename)
     printf("header.MGZones         = %#X |", header.MGZones);
     if (header.MGZones == 0)
         printf("All regions blocked (useless)|");
-    else if (header.MGZones == REGION_ALL_ALLOWED )
+    else if (header.MGZones == REGION_ALL_ALLOWED)
         printf("All regions allowed|");
     else {
         if (header.MGZones & REGION_JP)
@@ -493,9 +493,14 @@ int Kelf::LoadContent(const std::string &filename, int headerid)
 
     // arcade
     if (ks.GetOverrideKbit().size() && ks.GetOverrideKc().size()) {
+        printf("Overriding Kbit and Kc\n");
         memcpy(Kbit.data(), ks.GetOverrideKbit().data(), 16);
         memcpy(Kc.data(), ks.GetOverrideKc().data(), 16);
     }
+    printf("Kbit: %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x\n",
+           Kbit[0], Kbit[1], Kbit[2], Kbit[3], Kbit[4], Kbit[5], Kbit[6], Kbit[7], Kbit[8], Kbit[9], Kbit[10], Kbit[11], Kbit[12], Kbit[13], Kbit[14], Kbit[15]);
+    printf("Kc: %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x\n",
+           Kc[0], Kc[1], Kc[2], Kc[3], Kc[4], Kc[5], Kc[6], Kc[7], Kc[8], Kc[9], Kc[10], Kc[11], Kc[12], Kc[13], Kc[14], Kc[15]);
 
     std::fill(bitTable.gap, bitTable.gap + 3, 0);
 
@@ -745,11 +750,11 @@ int Kelf::VerifyContentSignature()
                 // printf("\n");
 
                 TdesCbcCfb64Encrypt(signature, signature, 8, ks.GetSignatureMasterKey().data(), 1, MG_IV_NULL);
-                printf("signature = ");
-                for (unsigned int j = 0; j < 8; ++j)
-                    printf(" %02X", (unsigned char)signature[j]);
-                printf("\n");
             }
+            printf("signature = ");
+            for (unsigned int j = 0; j < 8; ++j)
+                printf(" %02X", (unsigned char)signature[j]);
+            printf("\n");
 
             if (memcmp(bitTable.Blocks[i].Signature, signature, 8) != 0) {
                 printf("bitTable.Blocks[%u].Signature = ", i);
