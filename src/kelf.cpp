@@ -498,9 +498,9 @@ int Kelf::LoadContent(const std::string &filename, int headerid)
         memcpy(Kc.data(), ks.GetOverrideKc().data(), 16);
     }
     printf("Kbit: %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x\n",
-           Kbit[0], Kbit[1], Kbit[2], Kbit[3], Kbit[4], Kbit[5], Kbit[6], Kbit[7], Kbit[8], Kbit[9], Kbit[10], Kbit[11], Kbit[12], Kbit[13], Kbit[14], Kbit[15]);
+           (uint8_t)Kbit[0], (uint8_t)Kbit[1], (uint8_t)Kbit[2], (uint8_t)Kbit[3], (uint8_t)Kbit[4], (uint8_t)Kbit[5], (uint8_t)Kbit[6], (uint8_t)Kbit[7], (uint8_t)Kbit[8], (uint8_t)Kbit[9], (uint8_t)Kbit[10], (uint8_t)Kbit[11], (uint8_t)Kbit[12], (uint8_t)Kbit[13], (uint8_t)Kbit[14], (uint8_t)Kbit[15]);
     printf("Kc: %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x\n",
-           Kc[0], Kc[1], Kc[2], Kc[3], Kc[4], Kc[5], Kc[6], Kc[7], Kc[8], Kc[9], Kc[10], Kc[11], Kc[12], Kc[13], Kc[14], Kc[15]);
+           (uint8_t)Kc[0], (uint8_t)Kc[1], (uint8_t)Kc[2], (uint8_t)Kc[3], (uint8_t)Kc[4], (uint8_t)Kc[5], (uint8_t)Kc[6], (uint8_t)Kc[7], (uint8_t)Kc[8], (uint8_t)Kc[9], (uint8_t)Kc[10], (uint8_t)Kc[11], (uint8_t)Kc[12], (uint8_t)Kc[13], (uint8_t)Kc[14], (uint8_t)Kc[15]);
 
     std::fill(bitTable.gap, bitTable.gap + 3, 0);
 
