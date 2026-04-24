@@ -117,6 +117,8 @@ int Kelf::LoadKelf(const std::string &filename)
         printf(" (DNASLOAD)\n");
     else if (!memcmp(header.UserDefined, USER_HEADER_NAMCO_SECURITY_DONGLE_BOOTFILE, 16))
         printf(" (System 2x6 Dongle BootFile)\n");
+    else if (!memcmp(header.UserDefined, USER_HEADER_XFROM, 16))
+        printf(" (PSX XFROM)\n");
     else if (!memcmp(header.UserDefined, USER_HEADER_FHDB, 16))
         printf(" (FHDB)\n");
     else if (!memcmp(header.UserDefined, USER_HEADER_MBR, 16))
@@ -391,6 +393,10 @@ int Kelf::SaveKelf(const std::string &filename, int headerid)
             USER_HEADER = USER_HEADER_NAMCO_SECURITY_DONGLE_BOOTFILE;
             break;
 
+        case HEADER::XFROM:
+            USER_HEADER = USER_HEADER_XFROM;
+            break;
+
         default:
             USER_HEADER = USER_HEADER_FHDB;
             break;
@@ -475,6 +481,10 @@ int Kelf::LoadContent(const std::string &filename, int headerid)
 
         case HEADER::MBR:
             USER_Kbit = USER_Kbit_MBR;
+            break;
+
+        case HEADER::XFROM:
+            USER_Kbit = USER_Kbit_XFROM;
             break;
 
         default:

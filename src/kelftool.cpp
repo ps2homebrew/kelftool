@@ -17,6 +17,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <limits>
+#include <cstdint>
 
 #include "keystore.h"
 #include "kelf.h"
@@ -87,7 +88,7 @@ int encrypt(int argc, char **argv)
 
     if (argc < 4) {
         printf("%s encrypt <headerid> <input> <output> [Flags]\n", argv[0]);
-        printf("<headerid>: fmcb, fhdb, mbr, dnasload, dongle\n");
+        printf("<headerid>: fmcb, fhdb, mbr, dnasload, dongle, xfrom\n");
         printf("\tFlags:\n");
         printf("\t\t--keys        Specify keys to be used from PS2KEYS.dat (default, retail, dev, arcade, prototype)\n");
         printf("\t\t--mgzone      Specify custom region whitelist (default 0xFF: all allowed), example: --mgzone=0x03 (Japan+North America)\n");
@@ -154,6 +155,11 @@ int encrypt(int argc, char **argv)
     if (strcmp("dongle", argv[1]) == 0)
         headerid = HEADER::ARCADE_BOOTFILE;
 
+    if (strcmp("xfrom", argv[1]) == 0) {
+        headerid = HEADER::XFROM;
+        GSystemtype = SYSTEM_TYPE_PSX;
+    }
+
     if (headerid == HEADER::INVALID) {
 
         printf("Invalid header: %s\n", argv[1]);
@@ -193,13 +199,14 @@ int main(int argc, char **argv)
         printf("usage: %s <submodule> <args>\n", argv[0]);
         printf("Available submodules:\n");
         printf("\tdecrypt - decrypt and check signature of kelf files\n");
-        printf("\tencrypt <headerid> - encrypt and sign kelf files <headerid>: fmcb, fhdb, mbr, dnasload, dongle\n");
+        printf("\tencrypt <headerid> - encrypt and sign kelf files <headerid>: fmcb, fhdb, mbr, dnasload, dongle, xfrom\n");
         printf("\t\tfmcb     - for retail PS2 memory cards\n");
         printf("\t\tdnasload - for retail PS2 memory cardsfor retail PS2 memory cards (PSX bypass)\n");
         printf("\t\tdongle   - for arcade PS2 Security Dongle\n");
         printf("\t\tfhdb     - for retail PS2 HDD (HDD OSD / BB Navigator)\n");
-        printf("\t\tmbr      - for retail PS2 HDD (mbr injection).\n");
-        printf("\t\t           Note: for mbr elf should load from 0x100000 and should be without headers:\n");
+        printf("\t\tmbr      - for retail PS2 HDD (mbr injection)\n");
+        printf("\t\txfrom    - for retail PSX XFROM (xosdmain.elf)\n");
+        printf("\t\t           Note: for mbr and xfrom elf should load from 0x100000 and should be without headers:\n");
         printf("\t\t           readelf -h <input_elf> should show 0x100000 or 0x100008\n");
         printf("\t\t           $(EE_OBJCOPY) -O binary -v <input_elf> <headerless_elf>\n");
         return -1;
