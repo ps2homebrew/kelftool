@@ -12,10 +12,10 @@ CXXFLAGS = --std=c++17
 LDLIBS = -lcrypto
 
 # next flags only for macos
-# change paths to your location of openssl@1.1
+# change paths to your location of openssl@3
 ifdef HOMEBREW_PREFIX
-	OUTPUT_OPTION += -I$(HOMEBREW_PREFIX)/opt/openssl@1.1/include
-	LDLIBS += -L$(HOMEBREW_PREFIX)/opt/openssl@1.1/lib
+	OUTPUT_OPTION += -I$(HOMEBREW_PREFIX)/opt/openssl@3/include
+	LDLIBS += -L$(HOMEBREW_PREFIX)/opt/openssl@3/lib
 endif
 
 objects =	$(patsubst $(dir_source)/%.cpp, $(dir_build)/%.o, \
