@@ -17,6 +17,7 @@
 #ifndef __KELF_H__
 #define __KELF_H__
 
+#include <cstdint>
 #include "keystore.h"
 
 #define KELF_ERROR_INVALID_DES_KEY_COUNT       -1
