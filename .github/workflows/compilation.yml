@@ -34,6 +34,9 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      - name: Install OpenSSL
+        run: brew install openssl@3
+
       - name: Build
         run: |
           make
